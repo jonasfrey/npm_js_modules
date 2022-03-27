@@ -1,3 +1,7 @@
+# deprecated 
+
+this package is deprecated, please use https://www.npmjs.com/package/f_a_link_object_properties
+
 # import 
 ```javascript 
 import f_link_object_properties from "./es6_modules/f_link_object_properties/f_link_object_properties.module.js"
@@ -25,8 +29,7 @@ console.log(o_2.also_a_num) // 369
 
 
 o_2.num = 1.618 
-
-console.log(o_2.also_a_num) // 1.618
+veraltet.618
 console.log(o_1.num) // 1.618
 
 ```
