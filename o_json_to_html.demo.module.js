@@ -7,6 +7,7 @@ import o_json_to_html from "./o_json_to_html/o_json_to_html.module.js"
 
 
 
+document.addEventListener('DOMContentLoaded', () => {
 window.o_json_to_html_demo = {
 
 } 
@@ -355,7 +356,13 @@ o_json_to_html_demo.o_data = {
     text_style: {
         color: "red"
     },
-    text_innerhtml: "logogogogos"
+    style: {
+        left:"10%"
+    },
+    text_innerhtml: "logogogogos", 
+    nested: {
+        "text": "asdf"
+    }
 }
 
 o_json_to_html_demo.s_json_example_with_data = {
@@ -365,30 +372,64 @@ o_json_to_html_demo.s_json_example_with_data = {
         {
             "t" : "h2" , 
             // "s_inner_html<>": "text_innerhtml", // ! not working
-            "innerHTML<>" : "text_input",
-        },
-        {
-            "t" : "input" , 
-            "type" : "text", 
-            "value<>" : "text_input",  
-            "style<o>": "text_style"
+            "innerHTML<>" : "nested.text",
         },
         {
             "t" : "h1" , 
             // "s_inner_html<>": "text_innerhtml", // ! not working
-            "innerHTML<>" : "text_input",
+            "innerText<>" : "text_input",
         }, 
+        {
+            "t" : "input" , 
+            "type" : "text", 
+            "value<>" : "nested.text",  
+            // "style<o>": "text_style"
+        },
         {
             "t" : "span" , 
             // "s_inner_html<>": "text_innerhtml", // ! not working
             "innerHTML<>" : "text_input",
         },
+        {
+            "t" : "span" , 
+            // "s_inner_html<>": "text_innerhtml", // ! not working
+            "innerHTML<>" : "nested.text",
+        },
+        {
+            "c":[
+                {
+                    "t": "span", 
+                    "innerHTML<>":"nested.text", 
+                    "style<o>": "style"
+                }, 
+                {
+                    "c":[
+                        {
+                            "t": "span", 
+                            "innerHTML<>":"nested.text", 
+                            "style<o>": "style"
+                        }, 
+                        {
+                            "c":[
+                                {
+                                    "t": "span", 
+                                    "innerHTML<>":"nested.text", 
+                                    "style<o>": "style"
+                                }, 
+                                
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
     ]
 }
 
 document.documentElement.appendChild(
     o_json_to_html.f_json_to_html(
         o_json_to_html_demo.s_json_example_with_data, 
-        o_json_to_html_demo.o_data
+        o_json_to_html_demo.o_data, 
     )
 )
+});

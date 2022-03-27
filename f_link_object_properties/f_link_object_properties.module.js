@@ -80,4 +80,4 @@ var f_link_object_properties = function(
 }
 
 
-export default {f_link_object_properties}
+export default f_link_object_properties

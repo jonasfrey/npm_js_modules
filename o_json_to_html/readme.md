@@ -162,3 +162,8 @@ o_json_to_html.s_default_tag_name = ""
 o_json_to_html.s_tag_inner_html = "innerHTML"
 o_json_to_html.s_tag_inner_text = "innerText"
 ```
+
+# version log
+
+## 1.0.4: data object support
+you can now link data properties with `propname_on_html_element<>`:`propname_on_data_element`

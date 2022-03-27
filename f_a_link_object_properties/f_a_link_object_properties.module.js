@@ -13,7 +13,7 @@ var o_proxy_handler =
         return Reflect.get(object, s_prop)
     },
     set(object,s_prop,value){
-        // console.log("set called")
+        console.log(object)
         // console.log(object, s_prop, value)
         object[s_prop] = value
         if(s_prop != "a_o_other"){
@@ -104,4 +104,4 @@ var f_a_link_object_properties = function(
     // return o_object_a
 }
 
-export default {f_a_link_object_properties}
+export default f_a_link_object_properties
