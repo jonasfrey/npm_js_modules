@@ -1,0 +1,15 @@
+{
+  "name": "input_type_textnumber",
+  "version": "1.0.3",
+  "description": "## controls  when a certain modifier key is pressed the step changes",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.3",
+    "o_hidstatusmap": "^1.0.0"
+  }
+}

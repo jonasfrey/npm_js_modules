@@ -1,0 +1,11 @@
+{
+  "name": "math_tau_module",
+  "version": "1.0.3",
+  "description": "τ > π",
+  "main": "math_tau_module.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

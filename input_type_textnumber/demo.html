@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>demo </title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="">
+        <style>
+            *{
+                margin:0;
+                padding:0;
+                background:#333; 
+                color:#eee; 
+                font-family: Arial, Helvetica, sans-serif;
+                font-size: 20px;
+            }
+            input{
+                padding:1rem;
+                border: 1px solid rgb(163, 163, 163); 
+                box-shadow: 0 2px 5px 1px rgb(64 60 67 / 16%);
+                width: 80%;
+            }
+            input:focus{
+                border: 1px solid rgb(163, 163, 163); 
+            }
+            body{
+                
+                min-height: 130vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-direction: column;
+            }
+        </style>
+
+        <script type="importmap">
+            {
+                "imports": {
+                    "o_hidstatusmap": "./node_modules/o_hidstatusmap/o_hidstatusmap_module.js"
+                }
+            }
+            </script>
+
+    </head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+
+        <!-- <label> input type='text' data_input_type_textnumber use arrow keys to change number</label> -->
+        
+        <input type="text" value="tau(6.28) is bigger than pi (3.14)" data_input_type_textnumber="true">
+
+        <!-- <input type="text" value="-1.23 < 321.123" data_input_type_textnumber="true"> -->
+        
+        <style>
+
+            .data_input_type_textnumber_highlight_number {
+                background: rgba(46, 142, 238, 0.4) !important;
+                /* disply none to completly hide it */
+                /* display: none !important; add  */
+            }
+
+            .data_input_type_textnumber_highlight_char {
+                background: rgba(62, 211, 25, 0.4) !important;
+                /* disply none to completly hide it */
+                /* display: none !important; add  */
+            }
+        </style>
+        <script type="module" async defer>
+
+            import o_input_type_textnumber from "./input_type_textnumber.js"
+            // console.log(o_input_type_textnumber)
+
+        </script>
+    </body>
+</html>

@@ -1,0 +1,617 @@
+
+var f_link_object_properties = function(
+    object_a_tmp,
+    s_property_a_tmp, 
+    object_b_tmp,
+    s_property_b_tmp, 
+    s_direction = "<>"
+    ){
+        if(s_direction == "<o>"){
+            // if the values are objects, they simply can be linked by reference 
+            object_a_tmp[s_property_a_tmp] = object_b_tmp[s_property_b_tmp]
+            return true
+        }
+        var object_a = object_a_tmp
+        var s_property_a = s_property_a_tmp  
+        var object_b = object_b_tmp
+        var s_property_b = s_property_b_tmp
+        if(s_direction == ">"){
+            //swap props to change direction 
+            var object_a = object_b_tmp
+            var s_property_a = s_property_b_tmp  
+            var object_b = object_a_tmp
+            var s_property_b = s_property_a_tmp
+        }
+
+    function property(object, prop) {
+        return {
+            get value () {
+                return object[prop]
+            },
+            set value (val) {
+                object[prop] = val;
+            }
+        };
+    }
+    var o_ref_to_s_property_a_on_object_a = property(object_a, s_property_a);
+
+
+    var tmp = object_b[s_property_b];
+    var s_a_linked_objects_prop_name = "a_linked_objects"+s_property_b
+    if(!object_b[s_a_linked_objects_prop_name]){
+        Object.defineProperty(
+            object_b,
+            s_a_linked_objects_prop_name,
+            {
+                enumerable: false,
+                writable: true, 
+                value: []
+            }
+        )
+
+    }
+    object_b[s_a_linked_objects_prop_name].push(o_ref_to_s_property_a_on_object_a);
+    Object.defineProperty(
+        object_b,
+        s_property_b,
+        {
+            
+            set: function(value) {
+                for(var n_index in object_b[s_a_linked_objects_prop_name]){
+                    object_b[s_a_linked_objects_prop_name][n_index].value = value
+                }
+                // o_ref_to_s_property_a_on_object_a.value = value;
+                this["_"+s_property_b] = value;
+                        
+            },  
+            get: function() {
+                if(s_direction == "<>"){
+                    return o_ref_to_s_property_a_on_object_a.value
+                }else{
+                    return this["_"+s_property_b]
+                }
+
+            }
+        }
+        );
+        object_b[s_property_b] = tmp 
+    
+}
+
+
+class O_proxy {
+    constructor(
+        object_parent, 
+        s_property_parent,
+        s_property_child,
+        a_objects = []
+    ) {
+       this.is_proxy = true
+       this.target = this;
+       this.object_parent = object_parent
+       this.s_property_parent = s_property_parent
+       this.s_property_child = s_property_child
+       this.a_objects = a_objects
+        
+       return new Proxy(this, this);
+    }
+    add_object(object){
+        this.a_objects.push(object)
+    }
+    set (o_target, s_property, value) {
+        console.log(o_target, s_property, value)
+        // if(s_property == this.s_property_child){
+        //     if(!value.from_other_o_proxy){
+        //         o_target[s_property] = value;
+        //         this.object_parent[this.s_property_parent][this.s_property_child] = {value:value, from_other_o_proxy: true};
+        //     }else{
+        //         o_target[s_property] = value.value;
+        //     }
+
+        // }else{
+        //     o_target[s_property] = value
+        // }
+        o_target[s_property] = value;
+
+        for(var n_index in this.a_objects){
+            var o_object = this.a_objects[n_index]; 
+            o_object.object[o_object.s_property] = value;
+        }
+        return true;
+    }
+    get(o_target, s_prop){
+        // if(s_prop =="get_the_proxy_target") return o_target
+        return o_target[s_prop]
+    }
+ }
+
+ var f_link_object_properties_with_proxy_classes = function(
+    object_parent_a_tmp,
+    s_property_parent_a_tmp, 
+    s_property_child_a_tmp, 
+    object_parent_b_tmp,
+    s_property_parent_b_tmp, 
+    s_property_child_b_tmp, 
+    s_direction = "<>"
+    ){
+
+
+
+        if(!object_parent_a_tmp[s_property_parent_a_tmp].is_proxy){
+            console.log('new proxy')
+            object_parent_a_tmp[s_property_parent_a_tmp] = new O_proxy()
+        }
+        object_parent_a_tmp[s_property_parent_a_tmp].add_object(
+            {object: object_parent_b_tmp[s_property_parent_b_tmp], s_property: s_property_child_b_tmp}
+        )
+
+        if(!object_parent_b_tmp[s_property_parent_b_tmp].is_proxy){
+            object_parent_b_tmp[s_property_parent_b_tmp] = new O_proxy()
+        }
+        object_parent_b_tmp[s_property_parent_b_tmp].add_object(
+            {object: object_parent_a_tmp[s_property_parent_a_tmp], s_property: s_property_child_a_tmp}
+        )
+
+
+        console.log(object_parent_a_tmp[s_property_parent_a_tmp])
+        if(typeof object_parent_a_tmp[s_property_parent_a_tmp].addEventListener == "function"){
+            object_parent_a_tmp[s_property_parent_a_tmp].onkeyup = function(event){
+                console.log(event)
+                object_parent_b_tmp[s_property_parent_b_tmp][s_property_child_b_tmp] = event.target.value 
+            }
+        }
+        
+}
+
+var f_link_object_properties_with_proxy = function(
+    object_parent_a_tmp,
+    s_property_parent_a_tmp, 
+    s_property_child_a_tmp, 
+    object_parent_b_tmp,
+    s_property_parent_b_tmp, 
+    s_property_child_b_tmp, 
+    s_direction = "<>"
+    ){
+
+
+        // var s_property_a_tmp_private = "_"+s_property_a_tmp
+        // var s_property_b_tmp_private = "_"+s_property_b_tmp
+        object_parent_a_tmp[s_property_parent_a_tmp] = new Proxy(
+            object_parent_a_tmp[s_property_parent_a_tmp], 
+            {
+                set (o_target, s_property, value) {
+                    if(s_property == s_property_child_a_tmp){
+                        
+                        if(!value.from_b){
+                            o_target[s_property] = value;
+                            object_parent_b_tmp[s_property_parent_b_tmp][s_property_child_b_tmp] = {value:value, from_a: true};
+                        }else{
+                            o_target[s_property] = value.value;
+                        }
+
+                    }else{
+                        o_target[s_property] = value
+                    }
+                    return true;
+                }, 
+                get(o_target, s_prop){
+                    // if(s_prop =="get_the_proxy_target") return o_target
+                    return o_target[s_prop]
+                }
+            }
+        );
+
+        object_parent_b_tmp[s_property_parent_b_tmp] = new Proxy(
+            object_parent_b_tmp[s_property_parent_b_tmp], 
+            {
+                set (o_target, s_property, value) {
+                    if(s_property == s_property_child_b_tmp){
+                        if(!value.from_a){
+                            o_target[s_property] = value;
+                            object_parent_a_tmp[s_property_parent_a_tmp][s_property_child_a_tmp] = {value:value, from_b: true};
+                        }else{
+                            o_target[s_property] = value.value;
+                        }
+                    }else{
+                        o_target[s_property] = value
+                    }
+                    return true;
+
+                }, 
+                get(o_target, s_prop){
+                    // if(s_prop =="get_the_proxy_target") return o_target
+                    return o_target[s_prop]
+                }
+            }
+        );
+        
+        if(typeof object_parent_a_tmp[s_property_parent_a_tmp].addEventListener == "function"){
+            object_parent_a_tmp[s_property_parent_a_tmp].onkeyup = function(event){
+                object_parent_b_tmp[s_property_parent_b_tmp][s_property_child_b_tmp] = {value:event.target.value, from_a: true};
+            }
+        }
+
+
+        // if(typeof object_parent_b_tmp[s_property_parent_b_tmp].addEventListener == "function"){
+        //     object_parent_b_tmp[s_property_parent_b_tmp].onkeyup = function(event){
+        //         object_parent_a_tmp[s_property_parent_a_tmp][s_property_child_a_tmp] = {value:event.target.value, from_b: true};
+        //     }
+        // }
+    
+}
+var f_demo = function(){
+
+    // tests 
+    // add link
+    window.o_f_link_properties_demo = {}
+    o_f_link_properties_demo.o_1 = {num: 2, string: "asdf", obj: {num:44, string: "asdf"}}
+    
+    o_f_link_properties_demo.o_2 = {num: 18, string: "jo", obj: {num:99, string: "asdffffdsa"}}
+    
+    f_link_object_properties(o_f_link_properties_demo.o_1, "string", o_f_link_properties_demo.o_2, "string")
+    
+    o_f_link_properties_demo.o_1.string = "now both contain this"
+    
+    console.log(o_f_link_properties_demo.o_1.string) // "now both contain this"
+    console.log(o_f_link_properties_demo.o_2.string) // "now both contain this"
+    
+    o_f_link_properties_demo.o_3 = {s_please_me_too:"yeh i also want link"}
+    
+    //add another link
+    f_link_properties(o_f_link_properties_demo.o_1, "string", o_f_link_properties_demo.o_3, "s_please_me_too")
+    
+    o_f_link_properties_demo.o_3.s_please_me_too = "gugugugs"
+    
+    console.log(o_f_link_properties_demo.o_1.string) // "gugugugs"
+    console.log(o_f_link_properties_demo.o_2.string) // "gugugugs"
+    console.log(o_f_link_properties_demo.o_3.s_please_me_too) // "gugugugs"
+    
+}
+
+var f_demo_linking_html_object_input = function(){
+
+    //linking multiple on first param
+    window.o_f_link_properties_demo = {}
+    o_f_link_properties_demo.o_data = {num_o_1: 1}
+    o_f_link_properties_demo.o_data2 = {num_o_2: 1}
+    o_f_link_properties_demo.o_2 = document.createElement("input")
+    o_f_link_properties_demo.o_2.type = "text"
+    o_f_link_properties_demo.o_2.style.position = "absolute"
+    o_f_link_properties_demo.o_2.style.left = "10%"
+    o_f_link_properties_demo.o_2.style.zIndex = 12341234
+    o_f_link_properties_demo.o_2.custom_prop = 12341234
+
+    document.body.appendChild(o_f_link_properties_demo.o_2)
+    // o_f_link_properties_demo.o_2.addEventListener("input", function(event){
+    //     // console.log(event.target.value)
+    //     var tmp = this.value
+    //     this.value = "adsf"
+    //     this.value = tmp
+    //     // this.setAttribute("value", event.target.value)
+    // })
+
+
+    f_link_object_properties(
+        o_f_link_properties_demo.o_2,
+        "value",
+        o_f_link_properties_demo.o_data,
+        "num_o_1",
+    )
+
+    o_f_link_properties_demo.o_3 = document.createElement("div")
+    o_f_link_properties_demo.o_3.type = "text"
+    o_f_link_properties_demo.o_3.style.position = "absolute"
+    o_f_link_properties_demo.o_3.style.left = "40%"
+    o_f_link_properties_demo.o_3.style.zIndex = 12341234
+    o_f_link_properties_demo.o_3.custom_prop = 12341234
+
+    document.body.appendChild(o_f_link_properties_demo.o_3)
+
+    f_link_object_properties(
+        o_f_link_properties_demo.o_data,
+        "num_o_1",
+        o_f_link_properties_demo.o_data2,
+        "num_o_2",
+        ">"
+    )
+}
+var f_demo_link_objects_with_proxies_class = function(){
+
+    //linking multiple on first param
+    window.o_f_link_properties_demo = {}
+    o_f_link_properties_demo.o_data = {num_o_1: 1}
+    o_f_link_properties_demo.o_2 = document.createElement("input")
+    o_f_link_properties_demo.o_2.type = "text"
+    o_f_link_properties_demo.o_2.style.position = "absolute"
+    o_f_link_properties_demo.o_2.style.left = "10%"
+    o_f_link_properties_demo.o_2.style.zIndex = 12341234
+    o_f_link_properties_demo.o_2.custom_prop = 12341234
+
+    document.body.appendChild(o_f_link_properties_demo.o_2)
+    // o_f_link_properties_demo.o_2.addEventListener("input", function(event){
+    //     // console.log(event.target.value)
+    //     var tmp = this.value
+    //     this.value = "adsf"
+    //     this.value = tmp
+    //     // this.setAttribute("value", event.target.value)
+    // })
+
+    o_f_link_properties_demo.o_3 = document.createElement("li")
+    o_f_link_properties_demo.o_3.style.position = "absolute"
+    o_f_link_properties_demo.o_2.type = "text"
+    o_f_link_properties_demo.o_3.style.left = "11%"
+    o_f_link_properties_demo.o_3.style.background = "blue"
+
+    o_f_link_properties_demo.o_3.style.top = "11%"
+    o_f_link_properties_demo.o_3.style.zIndex = 1
+    document.body.appendChild(o_f_link_properties_demo.o_3)
+
+    f_link_object_properties_with_proxy_classes(
+        o_f_link_properties_demo,
+        "o_2",
+        "value",
+        o_f_link_properties_demo,
+        "o_data",
+        "num_o_1",
+    )
+
+    f_link_object_properties_with_proxy_classes(
+        o_f_link_properties_demo,
+        "o_2",
+        "value",
+        o_f_link_properties_demo,
+        "o_3",
+        "innerHTML",
+    )
+
+    o_f_link_properties_demo.o_4 = document.createElement("li")
+    o_f_link_properties_demo.o_4.style.position = "absolute"
+    o_f_link_properties_demo.o_4.style.left = "33%"
+    o_f_link_properties_demo.o_4.style.top = "33%"
+    o_f_link_properties_demo.o_4.style.background = "red"
+    o_f_link_properties_demo.o_4.style.zIndex = 12341234
+    document.body.appendChild(o_f_link_properties_demo.o_4)
+
+    f_link_object_properties_with_proxy_classes(
+        o_f_link_properties_demo,
+        "o_2",
+        "value",
+        o_f_link_properties_demo,
+        "o_4",
+        "innerHTML",
+    )
+    
+}
+
+var f_demo_link_objects_with_proxies = function(){
+            //linking multiple on first param
+            window.o_f_link_properties_demo = {}
+            o_f_link_properties_demo.o_data = {num_o_1: 1}
+            o_f_link_properties_demo.o_2 = document.createElement("input")
+            o_f_link_properties_demo.o_2.type = "text"
+            o_f_link_properties_demo.o_2.style.position = "absolute"
+            o_f_link_properties_demo.o_2.style.left = "10%"
+            o_f_link_properties_demo.o_2.style.zIndex = 12341234
+            o_f_link_properties_demo.o_2.custom_prop = 12341234
+    
+            document.body.appendChild(o_f_link_properties_demo.o_2)
+            // o_f_link_properties_demo.o_2.addEventListener("input", function(event){
+            //     // console.log(event.target.value)
+            //     var tmp = this.value
+            //     this.value = "adsf"
+            //     this.value = tmp
+            //     // this.setAttribute("value", event.target.value)
+            // })
+    
+            o_f_link_properties_demo.o_3 = document.createElement("li")
+            o_f_link_properties_demo.o_3.style.position = "absolute"
+            o_f_link_properties_demo.o_2.type = "text"
+            o_f_link_properties_demo.o_3.style.left = "11%"
+            o_f_link_properties_demo.o_3.style.background = "blue"
+
+            o_f_link_properties_demo.o_3.style.top = "11%"
+            o_f_link_properties_demo.o_3.style.zIndex = 1
+            document.body.appendChild(o_f_link_properties_demo.o_3)
+    
+            f_link_object_properties_with_proxy(
+                o_f_link_properties_demo,
+                "o_2",
+                "value",
+                o_f_link_properties_demo,
+                "o_data",
+                "num_o_1",
+            )
+    
+            // f_link_object_properties_with_proxy(
+            //     o_f_link_properties_demo,
+            //     "o_2",
+            //     "value",
+            //     o_f_link_properties_demo,
+            //     "o_3",
+            //     "innerHTML",
+            // )
+
+            o_f_link_properties_demo.o_4 = document.createElement("li")
+            o_f_link_properties_demo.o_4.style.position = "absolute"
+            o_f_link_properties_demo.o_4.style.left = "33%"
+            o_f_link_properties_demo.o_4.style.top = "33%"
+            o_f_link_properties_demo.o_4.style.background = "red"
+            o_f_link_properties_demo.o_4.style.zIndex = 12341234
+            document.body.appendChild(o_f_link_properties_demo.o_4)
+    
+            f_link_object_properties_with_proxy(
+                o_f_link_properties_demo,
+                "o_2",
+                "value",
+                o_f_link_properties_demo,
+                "o_4",
+                "innerHTML",
+            )
+
+}
+var f_demo_linking_html_object = function(){
+        //linking multiple on first param
+        window.o_f_link_properties_demo = {}
+        o_f_link_properties_demo.o_data = {num_o_1: 1}
+        o_f_link_properties_demo.o_2 = document.createElement("input")
+        o_f_link_properties_demo.o_2.type = "text"
+        o_f_link_properties_demo.o_2.style.position = "absolute"
+        o_f_link_properties_demo.o_2.style.left = "10%"
+        o_f_link_properties_demo.o_2.style.zIndex = 12341234
+        o_f_link_properties_demo.o_2.custom_prop = 12341234
+
+        document.body.appendChild(o_f_link_properties_demo.o_2)
+        // o_f_link_properties_demo.o_2.addEventListener("input", function(event){
+        //     // console.log(event.target.value)
+        //     var tmp = this.value
+        //     this.value = "adsf"
+        //     this.value = tmp
+        //     // this.setAttribute("value", event.target.value)
+        // })
+
+        o_f_link_properties_demo.o_3 = document.createElement("div")
+        o_f_link_properties_demo.o_3.style.position = "absolute"
+        o_f_link_properties_demo.o_2.type = "text"
+        o_f_link_properties_demo.o_3.style.left = "11%"
+        o_f_link_properties_demo.o_3.style.top = "11%"
+        o_f_link_properties_demo.o_3.style.zIndex = 12341234
+        document.body.appendChild(o_f_link_properties_demo.o_3)
+
+        f_link_object_properties(
+            o_f_link_properties_demo.o_2,
+            "value",
+            o_f_link_properties_demo.o_data,
+            "num_o_1",
+        )
+        f_link_object_properties(
+            o_f_link_properties_demo.o_3,
+            "innerHTML",
+            o_f_link_properties_demo.o_data,
+            "num_o_1",
+        )
+        // f_link_object_properties(
+        //     o_f_link_properties_demo.o_2,
+        //     "value",
+        //     o_f_link_properties_demo.o_data,
+        //     "num_o_1",
+        // )
+        // f_link_object_properties(
+        //     o_f_link_properties_demo.o_3,
+        //     "innerHTML",
+        //     o_f_link_properties_demo.o_data,
+        //     "num_o_1",
+        // )
+}
+
+
+var f_demo_linking_multiple = function(){
+
+    //linking multiple on first param
+    window.o_f_link_properties_demo = {}
+    o_f_link_properties_demo.o_1 = {num_o_1: 1}
+    o_f_link_properties_demo.o_2 = {num_o_2: 2}
+    o_f_link_properties_demo.o_3 = {num_o_3: 3}
+    
+    
+    // f_link_object_properties(
+    //     o_f_link_properties_demo.o_1,
+    //     "num_o_1",
+    //     o_f_link_properties_demo.o_2,
+    //     "num_o_2"
+    // )
+    // f_link_object_properties(
+    //     o_f_link_properties_demo.o_1,
+    //     "num_o_1",
+    //     o_f_link_properties_demo.o_3,
+    //     "num_o_3"
+    // )
+
+
+    // o_f_link_properties_demo.o_1.num_o_1 = 1234; 
+    // console.log(o_f_link_properties_demo.o_1.num_o_1) // 1234 ? 
+    // console.log(o_f_link_properties_demo.o_2.num_o_2) // 1234 ? 
+    // console.log(o_f_link_properties_demo.o_3.num_o_3) // 1234 ? 
+
+    // o_f_link_properties_demo.o_2.num_o_2 = 999; 
+    // console.log(o_f_link_properties_demo.o_1.num_o_1) // 999 ? 
+    // console.log(o_f_link_properties_demo.o_2.num_o_2) // 999 ? 
+    // console.log(o_f_link_properties_demo.o_3.num_o_3) // 999 ? 
+
+    // o_f_link_properties_demo.o_3.num_o_3 = 333; 
+    // console.log(o_f_link_properties_demo.o_1.num_o_1) // 333 ? 
+    // console.log(o_f_link_properties_demo.o_2.num_o_2) // 333 ? 
+    // console.log(o_f_link_properties_demo.o_3.num_o_3) // 333 ? 
+
+    // linking mutliple on second param
+
+    f_link_object_properties(
+        o_f_link_properties_demo.o_2,
+        "num_o_2",
+        o_f_link_properties_demo.o_1,
+        "num_o_1",
+    )
+    f_link_object_properties(
+        o_f_link_properties_demo.o_3,
+        "num_o_3",
+        o_f_link_properties_demo.o_1,
+        "num_o_1",
+    )
+
+    o_f_link_properties_demo.o_1.num_o_1 = 1234; 
+    console.log(o_f_link_properties_demo.o_1.num_o_1) // 1234 ? 
+    console.log(o_f_link_properties_demo.o_2.num_o_2) // 1234 ? 
+    console.log(o_f_link_properties_demo.o_3.num_o_3) // 1234 ? 
+
+    o_f_link_properties_demo.o_2.num_o_2 = 333; 
+    console.log(o_f_link_properties_demo.o_1.num_o_1) // 333 ? 
+    console.log(o_f_link_properties_demo.o_2.num_o_2) // 333 ? 
+    console.log(o_f_link_properties_demo.o_3.num_o_3) // 333 ? 
+
+    o_f_link_properties_demo.o_3.num_o_3 = 909; 
+    console.log(o_f_link_properties_demo.o_1.num_o_1) // 1234 ? 
+    console.log(o_f_link_properties_demo.o_2.num_o_2) // 1234 ? 
+    console.log(o_f_link_properties_demo.o_3.num_o_3) // 1234 ? 
+}
+
+var f_demo_oneway = function(){
+        // tests 
+    // add link
+    window.o_f_demo_oneway = {}
+    
+    o_f_demo_oneway.o_1 = {num: 2}
+    o_f_demo_oneway.o_2 = {num: 18}
+    
+    f_link_object_properties(o_f_demo_oneway.o_1, "num", o_f_demo_oneway.o_2, "num", ">")
+    
+    o_f_demo_oneway.o_1.num = 81
+    console.log(JSON.stringify(o_f_demo_oneway))
+    
+    o_f_demo_oneway.o_2.num = 99
+    console.log(JSON.stringify(o_f_demo_oneway))
+    
+}
+
+var f_demo_link_objects = function(){
+    window.o_demo = {
+        o_1 : {
+            prop_obj: {a:1, b:2}
+        }, 
+        o_2 : {
+            other_obj: {}
+        }
+    }
+    f_link_object_properties(o_demo.o_1, "prop_obj", o_demo.o_2, "other_obj", "<o>")
+    o_demo.o_1.prop_obj.a =  555
+
+}
+// f_demo()
+// f_demo_oneway()
+// f_demo_link_objects()
+// f_demo_linking_multiple()
+// f_demo_linking_html_object()
+// f_demo_linking_html_object_input()
+// f_demo_link_objects_with_proxies()
+f_demo_link_objects_with_proxies_class()
+
+
+export default f_link_object_properties

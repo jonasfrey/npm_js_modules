@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "express": "^4.17.3",
+    "o_json_to_html": "^1.0.3"
+  }
+}

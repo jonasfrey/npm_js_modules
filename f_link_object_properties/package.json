@@ -1,0 +1,11 @@
+{
+  "name": "f_link_object_properties",
+  "version": "1.0.3",
+  "description": "",
+  "main": "f_link_object_properties.module.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
