@@ -28,14 +28,24 @@ class O_overlay_imgzoombox{
         this.o_canvas = document.createElement("canvas")
         this.o_canvas_context = this.o_canvas.getContext("2d"); 
         this.o_target = null
-
         this.o_data = {
+
+            b_drag_locked: false, 
             o_mouse: {
                 o_position_relative_to_img: {
+                    n_x_normalized: 0, 
                     n_x: 0, 
+                    n_y_normalized: 0, 
                     n_y: 0,
                     o_image_bounding_rect: {},
                 }, 
+                o_position_relative_to_window: {
+                    n_x_normalized: 0, 
+                    n_x: 0, 
+                    n_y_normalized: 0, 
+                    n_y: 0,
+                },
+                o_position_relative_to_window_last: {}, 
                 o_pixel_hovered_rgba: {
                     n_r: 0, 
                     n_g: 0, 
@@ -44,7 +54,14 @@ class O_overlay_imgzoombox{
                     n_n_rgba_max: 255, //(Uint8) 
                 }, 
             },
-            o_linked_to_o_html_element: {
+            o_overlay_box: {
+                o_style: {
+                    n_left: 0,
+                    n_top: 0, 
+                    s_style_inline: "background-image:url(...)"
+                },
+            },
+            o_img_preview: {
                 o_style: {
                     n_scale_factor : 10, // 500% 
                     s_style_inline: "background-image:url(...)"
@@ -72,15 +89,20 @@ class O_overlay_imgzoombox{
         var self = this
         this.f_on_mouse_move = function(event){
             // console.log(event.target)
-
+            self.o_data.o_mouse.o_position_relative_to_window_last = JSON.parse(JSON.stringify(self.o_data.o_mouse.o_position_relative_to_window))
             self.o_target = event.target
+            self.o_data.o_mouse.o_position_relative_to_window.n_x = event.clientX
+            self.o_data.o_mouse.o_position_relative_to_window.n_y = event.clientY
+            self.o_data.o_mouse.o_position_relative_to_window.n_x_normalized = event.clientY / window.innerWidth
+            self.o_data.o_mouse.o_position_relative_to_window.n_y_normalized = event.clientY / window.innerHeight
+            self.f_handle_drag()
+
             if(self.o_html_element.contains(
                 self.o_target
             )){
                 self.f_on_mouse_move_o_html_element(event) 
                 return
             }
-
             var s_url  = ''
 
             if(self.o_target.tagName == "IMG"){
@@ -122,6 +144,7 @@ class O_overlay_imgzoombox{
 
             // console.log(s_url)
 
+            
         }
         this.f_on_wheel = function(e){
 
@@ -133,18 +156,43 @@ class O_overlay_imgzoombox{
                 e.preventDefault();
                 e.stopImmediatePropagation()
                 // console.log(e.deltaY)
-                self.o_data.o_linked_to_o_html_element.o_style.n_scale_factor = 
-                    self.o_data.o_linked_to_o_html_element.o_style.n_scale_factor + (e.deltaY * self.o_data.o_linked_to_o_html_element.o_style.n_scale_factor*0.001 * -1)
-                self.o_data.o_linked_to_o_html_element.o_style.n_scale_factor = 
-                    Math.max(0.005, self.o_data.o_linked_to_o_html_element.o_style.n_scale_factor)
-                self.o_data.o_linked_to_o_html_element.o_style.n_scale_factor = 
-                    Math.min(100, self.o_data.o_linked_to_o_html_element.o_style.n_scale_factor)
+                self.o_data.o_img_preview.o_style.n_scale_factor = 
+                    self.o_data.o_img_preview.o_style.n_scale_factor + (e.deltaY * self.o_data.o_img_preview.o_style.n_scale_factor*0.001 * -1)
+                self.o_data.o_img_preview.o_style.n_scale_factor = 
+                    Math.max(0.005, self.o_data.o_img_preview.o_style.n_scale_factor)
+                self.o_data.o_img_preview.o_style.n_scale_factor = 
+                    Math.min(100, self.o_data.o_img_preview.o_style.n_scale_factor)
                 self.f_calculate_style()    
             }
         }
         this.f_add_event_listeners()
     }
-
+    f_handle_drag(){
+        var self = this
+        var mouse_delta_x = self.o_data.o_mouse.o_position_relative_to_window.n_x - self.o_data.o_mouse.o_position_relative_to_window_last.n_x
+        var mouse_delta_y = self.o_data.o_mouse.o_position_relative_to_window.n_y - self.o_data.o_mouse.o_position_relative_to_window_last.n_y
+        
+        if(self.o_data.b_drag_locked){
+            self.o_data.o_overlay_box.o_style.n_left += mouse_delta_x
+            self.o_data.o_overlay_box.o_style.n_top += mouse_delta_y            
+            self.o_data.o_overlay_box.o_style.s_style_inline = `left:${self.o_data.o_overlay_box.o_style.n_left}px;top:${self.o_data.o_overlay_box.o_style.n_top}px;`
+        }
+    }
+    f_on_mousedown(event){
+        var self = this;
+        
+        if(self.o_html_element.contains(
+            event.target
+        )){
+            console.log('asdf')
+            event.preventDefault()
+            self.o_data.b_drag_locked = true; 
+        }
+    }
+    f_on_mouseup(){
+        var self = this
+        self.o_data.b_drag_locked = false; 
+    }
     f_do_canvas_stuff(){
         var self = this
         var o_img = document.createElement("img"); 
@@ -210,26 +258,26 @@ class O_overlay_imgzoombox{
         var self = this
         var s_style_inline =  ""
         s_style_inline+=`background-image:url(${self.o_data.o_image.s_url});`
-        s_style_inline+=`background-size:${self.o_data.o_linked_to_o_html_element.o_style.n_scale_factor*100}%;`
+        s_style_inline+=`background-size:${self.o_data.o_img_preview.o_style.n_scale_factor*100}%;`
         // s_style_inline+=`background-position:${n_offset_x_perc}% ${n_offset_y_perc}%;`
         s_style_inline+=`background-position-x:${n_offset_x_perc}%, left;`// origin top
         s_style_inline+=`background-position-y:${n_offset_y_perc}%, top;`//origin left
-
-        // background-position-x: 0px, center;
-
-        self.o_data.o_linked_to_o_html_element.o_style.s_style_inline = s_style_inline
+        self.o_data.o_img_preview.o_style.s_style_inline = s_style_inline
 
 
-        var img = document.querySelector(".img_element");
-        var o_image_bounding_rect = img.getBoundingClientRect()
-        var s_style_inline2 =  ``
-        s_style_inline2+=`width: ${self.o_data.o_linked_to_o_html_element.o_style.n_scale_factor*100}%;`
-        self.o_data.o_linked_to_o_html_element.o_style.s_style_inline2 = s_style_inline2
+        // var img_preview = document.querySelector(".img_preview");
+        // var o_image_bounding_rect_img_preview = img.getBoundingClientRect()
 
-        s_style_inline2+=`left: calc(${n_offset_x_perc*self.o_data.o_linked_to_o_html_element.o_style.n_scale_factor}% - ${o_image_bounding_rect.width/2}px);`
-        s_style_inline2+=`top: calc(${n_offset_y_perc*self.o_data.o_linked_to_o_html_element.o_style.n_scale_factor}% - ${o_image_bounding_rect.height/2}px);`
-        s_style_inline2+=`width: ${self.o_data.o_linked_to_o_html_element.o_style.n_scale_factor*100}%;`
-        self.o_data.o_linked_to_o_html_element.o_style.s_style_inline2 = s_style_inline2
+        // var img = document.querySelector(".img_element");
+        // var o_image_bounding_rect = img.getBoundingClientRect()
+        // var s_style_inline2 =  ``
+        // s_style_inline2+=`width: ${self.o_data.o_img_preview.o_style.n_scale_factor*100}%;`
+        // self.o_data.o_img_preview.o_style.s_style_inline2 = s_style_inline2
+
+        // s_style_inline2+=`left: calc(-${self.o_data.o_mouse.o_position_relative_to_img.n_x_normalized*o_image_bounding_rect.width}px);`
+        // s_style_inline2+=`top: calc(-${self.o_data.o_mouse.o_position_relative_to_img.n_y_normalized*o_image_bounding_rect.height}px);`
+        // s_style_inline2+=`width: ${self.o_data.o_img_preview.o_style.n_scale_factor*100}%;`
+        // self.o_data.o_img_preview.o_style.s_style_inline2 = s_style_inline2
 
     }
 
@@ -257,6 +305,7 @@ class O_overlay_imgzoombox{
                 c: [
                     {
                         "class": this.s_class_name,
+                        "style<>": "o_overlay_box.o_style.s_style_inline",
                         "c": [
                             {
                                 "class": "top bar", 
@@ -359,14 +408,14 @@ class O_overlay_imgzoombox{
                                 "c": [
                                     {
                                         "class": "backgroundimage",
-                                        "style<>": "o_linked_to_o_html_element.o_style.s_style_inline",
+                                        "style<>": "o_img_preview.o_style.s_style_inline",
                                     },
-                                    {
-                                        "class": "img_element", 
-                                        "t": "img", 
-                                        "src<>": "o_image.s_url", 
-                                        "style<>": "o_linked_to_o_html_element.o_style.s_style_inline2",
-                                    },
+                                    // {
+                                    //     "class": "img_element", 
+                                    //     "t": "img", 
+                                    //     "src<>": "o_image.s_url", 
+                                    //     "style<>": "o_img_preview.o_style.s_style_inline2",
+                                    // },
                                 ]
                             },
                             {
@@ -379,7 +428,7 @@ class O_overlay_imgzoombox{
                                                 "s_inner_text": "mousewheel to change zoom factor: "
                                             },
                                             {
-                                                "innerText<>": "o_linked_to_o_html_element.n_scale_factor"
+                                                "innerText<>": "o_img_preview.n_scale_factor"
                                             }
                                         ]
                                     }
@@ -421,6 +470,7 @@ class O_overlay_imgzoombox{
                                 top:0; 
                                 left:0;
                                 background-size: contain;
+                                background-repeat: no-repeat;                            
                                 image-rendering: pixelated;
                             }
                             .img_element {
@@ -442,10 +492,14 @@ class O_overlay_imgzoombox{
     f_add_event_listeners(){
         window.addEventListener("mousemove", this.f_on_mouse_move)
         window.addEventListener("wheel",this.f_on_wheel.bind(this), { passive: false } )
+        window.addEventListener("mousedown",this.f_on_mousedown.bind(this), { passive: false } )
+        window.addEventListener("mouseup",this.f_on_mouseup.bind(this), { passive: false } )
     }
     f_remove_event_listeners(){
         window.removeEventListener("mousemove", this.f_on_mouse_move)
         window.removeEventListener("wheel",this.f_on_wheel.bind(this), { passive: false } )
+        window.removeEventListener("mousedown",this.f_on_mousedown.bind(this), { passive: false } )
+        window.removeEventListener("mouseup",this.f_on_mouseup.bind(this), { passive: false } )
     
     }
 

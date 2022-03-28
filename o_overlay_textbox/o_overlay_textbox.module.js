@@ -13,7 +13,8 @@
 //     // console.log(marked)
 // })();
 
-import "https://cdnjs.cloudflare.com/ajax/libs/marked/4.0.2/marked.min.js"
+import marked from "marked"
+// import "https://cdnjs.cloudflare.com/ajax/libs/marked/4.0.2/marked.min.js"
 
 // console.log(marked)
 window.marked = marked

@@ -8,6 +8,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "marked": "^4.0.12",
     "o_json_to_html": "^1.0.2"
   },
   "devDependencies": {},
