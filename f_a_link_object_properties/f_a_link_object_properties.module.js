@@ -13,7 +13,7 @@ var o_proxy_handler =
         return Reflect.get(object, s_prop)
     },
     set(object,s_prop,value){
-        console.log(object)
+        // console.log(object)
         // console.log(object, s_prop, value)
         object[s_prop] = value
         if(s_prop != "a_o_other"){
@@ -80,6 +80,7 @@ var f_a_link_object_properties = function(
     s_prop_b, 
     s_direction = "<>" // "<>"|| ">"
 ){
+
     //links / synchronized / binds / whatever you wanna call it 
     // two properties of two different objects to each other
     // uses Proxy, 

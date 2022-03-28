@@ -165,5 +165,13 @@ o_json_to_html.s_tag_inner_text = "innerText"
 
 # version log
 
-## 1.0.4: data object support
+## 1.0.4
+### data object support
 you can now link data properties with `propname_on_html_element<>`:`propname_on_data_element`
+
+
+### console.error 
+linking non exsiting properties will call a console.error, for example `property o_mouse.o_position.n_x does not exist in object`
+
+## 1.0.5
+readme improvements 

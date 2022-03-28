@@ -1,6 +1,6 @@
 {
   "name": "o_json_to_html",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "",
   "main": "o_json_to_html.module.js",
   "scripts": {

@@ -15,6 +15,7 @@ class O_json_to_html {
     }
 
     f_get_object_and_property_by_dot_notation(o_object, s_dotnotation){
+        var o_object_original = o_object
         // s_dotnotation my_object.some_obj.position.z => object => my_object.some_obj.position, property z
         var a_parts = s_dotnotation.split(".");
         while(a_parts.length>1){
@@ -24,7 +25,8 @@ class O_json_to_html {
             }
             o_object = o_object[a_parts.shift()]
         }
-        return {
+
+        var o_return  ={
             o_object: {
                 o_object: o_object, 
                 s_prop: a_parts.join("."), 
@@ -35,6 +37,12 @@ class O_json_to_html {
 
             }
         }
+
+        // if(!o_return.o_object.o_object || !o_return.o_object_parent.o_object){
+        //     console.error(`property ${s_dotnotation} does not exist in object ${o_object_original}`)
+        // }
+
+        return o_return
     }
 
     f_recursive_convert_object_to_html_element(object,  o_data = null){
@@ -71,6 +79,10 @@ class O_json_to_html {
                     o_data, 
                     this.s_default_o_data_first_property + "." + s_prop_name_o_data_for_linking
                 );
+                
+                if(!o_resolved_dotnotation.o_object.o_object || !o_resolved_dotnotation.o_object_parent.o_object){
+                    console.error(`property ${s_prop_name_o_data_for_linking} does not exist in object ${o_data}`)
+                }
 
                 var o_data_resolved = o_resolved_dotnotation.o_object.o_object
                 var o_data_resolved_parent = o_resolved_dotnotation.o_object_parent.o_object
@@ -78,6 +90,12 @@ class O_json_to_html {
                 var s_prop_o_data_resolved_parent = o_resolved_dotnotation.o_object_parent.s_prop
                 // debugger
                 if(o_string_ending.s_ending == "<>"){
+                    // console.log(
+                    //     o_data_resolved, 
+                    //     s_prop_o_data_resolved,
+                    //     o_html_element, 
+                    //     s_prop_name_o_html_element,
+                    // )
                     var a_objs = f_a_link_object_properties(
                         // the order is important!
                         o_data_resolved, 
@@ -134,8 +152,7 @@ class O_json_to_html {
                 s_prop_name != this.s_default_tag_name &&
                 s_prop_name != this.s_tag_inner_html &&
                 s_prop_name != this.s_tag_inner_text &&
-                !a_o_string_endings
-
+                !o_string_ending
                 ){
 
                 o_html_element.setAttribute(s_prop_name, value)
@@ -214,7 +231,6 @@ class O_json_to_html {
         )
     }
     f_javascript_object_to_html(value,  o_data = null){ 
-        
         return this.f_recursive_convert_object_to_html_element(
             this.f_convert_string_to_javascript_object(value),
             this.f_prepend_dotnotaion_to_o_data(o_data)

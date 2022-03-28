@@ -33,10 +33,10 @@ class O_overlay_textbox{
         this.o_element = this.f_o_html_element();
 
         document.body.appendChild(this.o_element)
-        
         this.o_html_element = this.o_element.querySelector("."+this.s_class_name)
 
         this.f_on_mouse_move = function(event){
+
             // console.log(event.target)
             if(!self.o_html_element.contains(
                 event.target
@@ -91,7 +91,7 @@ class O_overlay_textbox{
                 c: [
                     {
                         "class": this.s_class_name,
-                    }, 
+                    },
                     {
                         "t": "style", 
                         "s_inner_html": `
