@@ -7,15 +7,67 @@ class O_other{
         return this
     }
 }
+var s_property_name_for_getter_setter_object = "o_getter_setter"
+var s_prefix_property_name_for_getter_function = "f_getter_"
+var s_prefix_property_name_for_setter_function = "f_setter_"
+var b_setter_lock = false
+// example of object
+// var o_data = {
+//     position: {
+//         x: 2 , 
+//         y: 2, 
+//         z: 2, 
+//     }, 
+//     style:{
+//         background: "red", 
+//         top: "10", 
+//         o_getter_setter: {
+//             f_setter_top: function(value_old){
+//                 this.top = parseInt(this.top) + "px"
+//             },
+//             f_getter_top: function(value_old){
+//                 console.log("there was an access on the object ${this} on the property ${top}")
+//             }
+//         }
+//     }
+// }
 var o_proxy_handler = 
 {
     get(object, s_prop){
+        //if existing, call the setter function for this property
+        if(object.hasOwnProperty(s_property_name_for_getter_setter_object)){
+            if(object[s_property_name_for_getter_setter_object].hasOwnProperty(s_prefix_property_name_for_getter_function + s_prop)){
+                object[s_property_name_for_getter_setter_object][s_prefix_property_name_for_getter_function + s_prop].apply(object, [s_prop])
+            }
+        }
         return Reflect.get(object, s_prop)
     },
     set(object,s_prop,value){
+
+        // console.log("value")
+        // console.log(value)
+        // console.log("object")
         // console.log(object)
-        // console.log(object, s_prop, value)
+        console.log(object)
+        var value_old  = object[s_prop] 
         object[s_prop] = value
+        Reflect.set(object, s_prop, value)
+        
+
+        //if existing, call the getter function for this property
+        if(object.hasOwnProperty(s_property_name_for_getter_setter_object)){
+            if(object[s_property_name_for_getter_setter_object].hasOwnProperty(s_prefix_property_name_for_setter_function + s_prop)){
+                
+                if(!b_setter_lock){
+                    b_setter_lock = true
+                    // object[s_property_name_for_getter_setter_object][s_prefix_property_name_for_setter_function + s_prop].apply(object, [s_prop, value, value_old, this])
+                    object[s_property_name_for_getter_setter_object][s_prefix_property_name_for_setter_function + s_prop](s_prop, value, value_old, this)
+                    b_setter_lock = false
+                }
+            }
+        }
+
+        //set the value on the linked objects
         if(s_prop != "a_o_other"){
             // debugger
             for(var n_index in object.a_o_other){
@@ -23,13 +75,18 @@ var o_proxy_handler =
                 var n_index_s_prop_other = o_other.a_s_prop_other.indexOf(s_prop)
                 if(n_index_s_prop_other != -1){
                     //prevent max stack size exceeded
-                    if(o_other.object[o_other.a_s_prop_this[n_index_s_prop_other]] != value){
-                        o_other.object[o_other.a_s_prop_this[n_index_s_prop_other]] = value
+
+                    if(o_other.object[o_other.a_s_prop_this[n_index_s_prop_other]] != object[s_prop]){
+                        // console.log('value for other object')
+                        // console.log(object[s_prop])
+                        o_other.object[o_other.a_s_prop_this[n_index_s_prop_other]] = object[s_prop]
                     }
                 }
 
             }
         }
+
+
         return true
     }
 }
