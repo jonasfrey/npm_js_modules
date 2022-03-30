@@ -162,12 +162,15 @@ class O_json_to_html {
                 if(typeof value === "function"){
                     var self = this
                     //onclick , onmousemove, onwheel, etc functions
-                    
-                    o_html_element.addEventListener(s_prop_name.substring(2), function(){
-                      value.apply(self.o_data)  
+                    // console.log(value)
+                    var f_value = value 
+                    o_html_element.addEventListener(s_prop_name.substring(2), function(event){
+                        f_value.apply(self.o_data, [event])
                     })
                     // o_html_element[s_prop_name] = value
                 }else{
+                    // console.log(s_prop_name)
+                    // console.log(value)
                     o_html_element.setAttribute(s_prop_name, value)
                 }
 

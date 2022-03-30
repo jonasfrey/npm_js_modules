@@ -2,6 +2,7 @@
 
 import o_json_to_html from "./o_json_to_html/o_json_to_html.module.js"
 
+import {O_value} from "./f_a_link_object_properties/f_a_link_object_properties.module.js"
 
 // demo 
 
@@ -357,6 +358,7 @@ o_json_to_html_demo.o_data = {
         color: "red"
     },
     style: {
+        color: "blue",
         left:"10%"
     },
     text_innerhtml: "logogogogos", 
@@ -365,21 +367,26 @@ o_json_to_html_demo.o_data = {
     }, 
     o_box: {
         o_style: {
-            o_css: {
-                "background-color": "red", 
-                "padding": "20px", 
-                "border": "5px solid blue"
-            },
-            n_left: 0,
-            n_top: 0,
+            "a_s_font_family":["arial", "serif", "Helvetica"],  
+            
+            "background-color": "red", 
+            "padding": "20px", 
+            "border": "5px solid blue",
+            "font-size": "20px",
+            "font-family": "arial",
+            
             o_getter_setter: {
                 f_setter: function(value_old, object, s_prop, value){
                     // debugger 
-                    if(s_prop != "s_style_inline"){
+                    console.log(s_prop)
+                    console.log("f_setter called")
+                    if(["s_style_inline", "o_getter_setter"].indexOf(s_prop) == -1){
                         var s_css = ""
-                        for(var s_key in this.o_css){
+                        for(var s_key in this){
                             // debugger
-                            s_css += `${s_key}:${this.o_css[s_key]};` 
+                            if(["s_style_inline", "o_getter_setter", "a_s_font_family"].indexOf(s_key) == -1){
+                                s_css += `${s_key}:${this[s_key]};` 
+                            }
                         }
                         console.log(s_css)
                         
@@ -390,6 +397,20 @@ o_json_to_html_demo.o_data = {
             s_style_inline: "background-image:url(...)"
         },
     },
+    parse_int_test: {
+        n_num : 12, 
+        o_getter_setter: {
+            f_setter_n_num: function(value_old, object, s_prop, value){
+                
+                var val  = parseInt(this.n_num)
+                var o_value = new O_value(val)
+                o_value.b_dont_call_f_setter = true
+                // val.a_o_object.push(this)
+                // this.n_num = o_value 
+                console.log(val)
+            }
+        }
+    }
 }
 
 o_json_to_html_demo.s_json_example_with_data = {
@@ -402,16 +423,30 @@ o_json_to_html_demo.s_json_example_with_data = {
             "onclick": function(){
                 const color = '#' + Math.floor(Math.random() * (0xffffff + 1))
                 .toString(16)
-                .padStart(6, '0') 
+                .padStart(6, '0')
                 
                 // this.o_box.o_style.o_css needs to be a proxy// not so sure
-                this.o_box.o_style.o_css["background-color"] = color
-                this.o_box.o_style.o_css.padding = Math.random()*40+"px"
-                this.o_box.o_style.o_css.border = Math.random()*10+"px solid red"
+                this.o_box.o_style["background-color"] = color
+                this.o_box.o_style.padding = Math.random()*40+"px"
+                this.o_box.o_style.border = Math.random()*10+"px solid red"
+                this.o_box.o_style["font-family"] = this.o_box.o_style.a_s_font_family[parseInt(Math.random()*(this.o_box.o_style.a_s_font_family.length-1))]
+                this.o_box.o_style["font-size"] = Math.random()*40+"px"
                 // trigger the f_setter
-                this.o_box.o_style.n_left = 2 
+                // this.o_box.o_style.n_left = 2 
             }
         },
+        {
+            "t" : "h3" ,
+            "s_inner_text" : "parse int test",
+        }, 
+        {
+            "t" : "h3" ,
+            "innerText<>" : "parse_int_test.n_num",
+        }, 
+        {
+            "t" : "input" ,
+            "value<>" : "parse_int_test.n_num",
+        }, 
         {
             "t": "div", 
             "class": "o_box", 
@@ -419,21 +454,42 @@ o_json_to_html_demo.s_json_example_with_data = {
             // "dummy<>": "o_box.o_style.o_css.padding", 
             "style<>": "o_box.o_style.s_style_inline"
         },
+
         {
             "t" : "h2" , 
             // "s_inner_html<>": "text_innerhtml", // ! not working
             "innerHTML<>" : "nested.text",
+            "style<>": "o_box.o_style.s_style_inline"
         },
         {
-            "t" : "h1" , 
+            "t" : "h1" ,
             // "s_inner_html<>": "text_innerhtml", // ! not working
             "innerText<>" : "text_input",
         }, 
         {
+            "t" : "input",
+            "type":"range", 
+            "min": 1, 
+            "max": 40, 
+            "oninput": function(event){
+                console.log(event.target.value)
+                this.o_box.o_style["font-size"] = event.target.value+"px"
+            },
+            // "s_inner_html<>": "text_innerhtml", // ! not working
+            "innerText<>" : "text_input",
+        }, 
+        {
+            "t" : "input",
+            "style<>": "o_box.o_style.s_style_inline",
+            // "s_inner_html<>": "text_innerhtml", // ! not working
+            "value<>" : "o_box.o_style['font-size']",
+        },
+        {
+
             "t" : "input" , 
             "type" : "text", 
             "value<>" : "nested.text",  
-            // "style<o>": "text_style"
+            "style<o>": "text_style"
         },
         {
             "t" : "span" , 
@@ -450,7 +506,7 @@ o_json_to_html_demo.s_json_example_with_data = {
                 {
                     "t": "span", 
                     "innerHTML<>":"nested.text", 
-                    "style<o>": "style"
+                    "style": "color:red"
                 }, 
                 {
                     "c":[

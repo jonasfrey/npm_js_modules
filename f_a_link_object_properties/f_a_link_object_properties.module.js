@@ -45,6 +45,15 @@ class O_other{
         return this
     }
 }
+// to set the value on the linked objects, this object will be used, 
+class O_value{
+    constructor(value){
+        this.value = value// the actual original value  in the setter function, set by someone or some code in the script 
+        this.a_o_object = [] // when a value on a  object is set, the object will be appended to this array, 
+                            // if the object is in the array , the value wont be set again, this prevents infinity recursion
+        this.b_dont_call_f_setter = false
+    }
+}
 
 var f_add_property_o_proxy = function(o_object){
     Object.defineProperty(
@@ -113,6 +122,25 @@ var o_proxy_handler =
         return Reflect.get(object, s_prop)
     },
     set(object,s_prop,value){
+        var value_old  = object[s_prop]
+        // debugger
+
+        if(value instanceof O_value){
+            var o_value = value
+
+            // the value is not the original value , 
+            // the setter was called by another setter
+            if(o_value.a_o_object.indexOf(object) == -1){
+                //the value was not set yet on this object 
+                Reflect.set(object, s_prop, o_value.value)
+            }
+        }else{
+            Reflect.set(object, s_prop, value)
+            o_value = new O_value(value)
+        }
+        // set the value for all the linked other objects
+
+        // foreach other linked 
         var s_prefix_property_name_for_setter_function_single_property = s_prefix_property_name_for_setter_function + "_" + s_prop
 
         // if(o_reserved_keyword_properties[s_prop]){
@@ -123,50 +151,59 @@ var o_proxy_handler =
         // console.log(value)
         // console.log("object")
         // console.log(object)
-        var value_old  = object[s_prop]
-        
-        //setting the value 
-        // object[s_prop] = value
-        Reflect.set(object, s_prop, value)
 
         //setting the value on the linked objects
-        if(s_prop != "a_o_other"){
-            // debugger
-            for(var n_index in object.a_o_other){
-                var o_other = object.a_o_other[n_index]
-                var n_index_s_prop_other = o_other.a_s_prop_other.indexOf(s_prop)
-                if(n_index_s_prop_other != -1){
+            if(s_prop != "a_o_other"){
+                for(var n_index in object.a_o_other){
+                    var o_other = object.a_o_other[n_index]
+                    var n_index_s_prop_other = o_other.a_s_prop_other.indexOf(s_prop)
+                    if(n_index_s_prop_other != -1){
                     //prevent max stack size exceeded
-
-                    if(o_other.object[o_other.a_s_prop_this[n_index_s_prop_other]] != object[s_prop]){
+                    // if(o_other.object[o_other.a_s_prop_this[n_index_s_prop_other]] != object[s_prop]){ //not working for el.style, 
+                        // Reflect.set(o_other.object.o_proxy,o_other.a_s_prop_this[n_index_s_prop_other],object[s_prop])
+                        // console.log("setting the value on the other")
+                        // console.log(object[s_prop])
+                        // console.log(o_other.object[o_other.a_s_prop_this[n_index_s_prop_other]])
                         // console.log('value for other object')
                         // console.log(object[s_prop])
-                        o_other.object.o_proxy[o_other.a_s_prop_this[n_index_s_prop_other]] = object[s_prop]
-                    }
+                        // debugger
+                        if(o_value.a_o_object.indexOf(o_other.object) == -1){
+                            o_other.object.o_proxy[o_other.a_s_prop_this[n_index_s_prop_other]] = o_value
+                        }
+                        
+                    // }
                 }
 
+                }
             }
-        }
-        //if existing, call the getter function for this property
-        if(object.hasOwnProperty(s_property_name_for_getter_setter_object)){
+        debugger
+        if(o_value.a_o_object.indexOf(object) == -1 && !o_value.b_dont_call_f_setter){
 
-            var f_setter_single_prop = object[s_property_name_for_getter_setter_object][s_prefix_property_name_for_setter_function_single_property]
-            var f_setter = object[s_property_name_for_getter_setter_object][s_prefix_property_name_for_setter_function]
-            if(f_setter_single_prop){
-                f_setter_single_prop.apply(
-                    // this// this is the handler, 
-                    object.o_proxy,
-                    [value_old, object, s_prop, value]
-                )
-            }
-            if(f_setter){
-                f_setter.apply(
-                    // this// this is the handler, 
-                    object.o_proxy,
-                    [value_old, object, s_prop, value]
-                )
+            //if existing, call the getter function for this property
+            if(object.hasOwnProperty(s_property_name_for_getter_setter_object)){
+
+                var f_setter_single_prop = object[s_property_name_for_getter_setter_object][s_prefix_property_name_for_setter_function_single_property]
+                var f_setter = object[s_property_name_for_getter_setter_object][s_prefix_property_name_for_setter_function]
+                if(f_setter_single_prop){
+                    f_setter_single_prop.apply(
+                        // this// this is the handler, 
+                        object.o_proxy,
+                        [value_old, object, s_prop, value]
+                    )
+                }
+                if(f_setter){
+                    f_setter.apply(
+                        // this// this is the handler, 
+                        object.o_proxy,
+                        [value_old, object, s_prop, value]
+                    )
+                }
             }
         }
+        
+        o_value.a_o_object.push(object)
+
+        // o_value.a_o_object.push(object)
 
         return true
     
@@ -243,4 +280,4 @@ var f_a_link_object_properties = function(
     return [o_object_a.o_proxy, o_object_b.o_proxy]
 }
 
-export {f_a_link_object_properties, f_add_property_o_proxy}
+export {f_a_link_object_properties, f_add_property_o_proxy, O_value}
