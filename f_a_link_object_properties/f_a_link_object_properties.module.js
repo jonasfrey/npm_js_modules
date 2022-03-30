@@ -70,7 +70,7 @@ var s_property_name_for_getter_setter_object = "o_getter_setter"
 var s_prefix_property_name_for_getter_function = "f_getter"
 var s_prefix_property_name_for_setter_function = "f_setter"
 var o_reserved_keyword_properties = {
-    a_o_other: "a_o_other", // the array of o_other instances, linked to this object
+    a_o_other: "a_o_other", // the array of o_other instances, linked to this object, 
 }
 // example of object
 // var o_data = {
@@ -133,8 +133,14 @@ var o_proxy_handler =
             if(o_value.a_o_object.indexOf(object) == -1){
                 //the value was not set yet on this object 
                 Reflect.set(object, s_prop, o_value.value)
+                // o_value.a_o_object.push(object)
+
             }
         }else{
+            if(o_reserved_keyword_properties[s_prop]){
+                console.warn(`the property name ${s_prop} is a reserved keyword property, using it can cause undefined behaviour`)
+                return false
+            }
             Reflect.set(object, s_prop, value)
             o_value = new O_value(value)
         }
@@ -143,40 +149,12 @@ var o_proxy_handler =
         // foreach other linked 
         var s_prefix_property_name_for_setter_function_single_property = s_prefix_property_name_for_setter_function + "_" + s_prop
 
-        // if(o_reserved_keyword_properties[s_prop]){
-        //     console.error(`the property name ${s_prop} is a reserved keyword property`)
-        //     return false
-        // }
+
         // console.log("value")
         // console.log(value)
         // console.log("object")
         // console.log(object)
 
-        //setting the value on the linked objects
-            if(s_prop != "a_o_other"){
-                for(var n_index in object.a_o_other){
-                    var o_other = object.a_o_other[n_index]
-                    var n_index_s_prop_other = o_other.a_s_prop_other.indexOf(s_prop)
-                    if(n_index_s_prop_other != -1){
-                    //prevent max stack size exceeded
-                    // if(o_other.object[o_other.a_s_prop_this[n_index_s_prop_other]] != object[s_prop]){ //not working for el.style, 
-                        // Reflect.set(o_other.object.o_proxy,o_other.a_s_prop_this[n_index_s_prop_other],object[s_prop])
-                        // console.log("setting the value on the other")
-                        // console.log(object[s_prop])
-                        // console.log(o_other.object[o_other.a_s_prop_this[n_index_s_prop_other]])
-                        // console.log('value for other object')
-                        // console.log(object[s_prop])
-                        // debugger
-                        if(o_value.a_o_object.indexOf(o_other.object) == -1){
-                            o_other.object.o_proxy[o_other.a_s_prop_this[n_index_s_prop_other]] = o_value
-                        }
-                        
-                    // }
-                }
-
-                }
-            }
-        debugger
         if(o_value.a_o_object.indexOf(object) == -1 && !o_value.b_dont_call_f_setter){
 
             //if existing, call the getter function for this property
@@ -202,6 +180,22 @@ var o_proxy_handler =
         }
         
         o_value.a_o_object.push(object)
+
+        //setting the value on the linked objects
+            if(s_prop != "a_o_other"){
+                for(var n_index in object.a_o_other){
+                    var o_other = object.a_o_other[n_index]
+                    var n_index_s_prop_other = o_other.a_s_prop_other.indexOf(s_prop)
+                    if(n_index_s_prop_other != -1){
+
+                        if(o_value.a_o_object.indexOf(o_other.object) == -1){
+                            o_other.object.o_proxy[o_other.a_s_prop_this[n_index_s_prop_other]] = o_value
+                        }
+                    }
+
+                }
+            }
+        
 
         // o_value.a_o_object.push(object)
 

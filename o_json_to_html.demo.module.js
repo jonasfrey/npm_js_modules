@@ -353,6 +353,9 @@ window.o_object = o_object
 
 
 o_json_to_html_demo.o_data = {
+    style_for_img: {
+        s_style_inline: "border:10px solid red"
+    },
     text_input: "hello test", 
     text_style: {
         color: "red"
@@ -402,12 +405,27 @@ o_json_to_html_demo.o_data = {
         o_getter_setter: {
             f_setter_n_num: function(value_old, object, s_prop, value){
                 
+                //this is an example on how to prevent infinit recursion
                 var val  = parseInt(this.n_num)
                 var o_value = new O_value(val)
                 o_value.b_dont_call_f_setter = true
                 // val.a_o_object.push(this)
-                // this.n_num = o_value 
+                this.n_num = o_value 
                 console.log(val)
+            }
+        }
+    },
+    infinit_recursion_test2: {
+        n_num : 12, 
+        b_setter_called : false, 
+        o_getter_setter: {
+            f_setter_n_num: function(value_old, object, s_prop, value){
+                
+                if(!this.b_setter_called){
+                    this.b_setter_called = true
+                    this.n_num = parseInt(this.n_num)
+                    this.b_setter_called = false
+                }
             }
         }
     }
@@ -437,15 +455,39 @@ o_json_to_html_demo.s_json_example_with_data = {
         },
         {
             "t" : "h3" ,
-            "s_inner_text" : "parse int test",
+            "s_inner_text" : "parse int test1 / infinit recusion test 1",
+            "style<>": "o_box.o_style.s_style_inline"
+
         }, 
         {
             "t" : "h3" ,
             "innerText<>" : "parse_int_test.n_num",
+            "style<>": "o_box.o_style.s_style_inline"
+
         }, 
         {
             "t" : "input" ,
             "value<>" : "parse_int_test.n_num",
+            "style<>": "o_box.o_style.s_style_inline"
+
+        }, 
+        {
+            "t" : "h3" ,
+            "s_inner_text" : "parse int test2 / infinit recusion test 2",
+            "style<>": "o_box.o_style.s_style_inline"
+
+        }, 
+        {
+            "t" : "h3" ,
+            "innerText<>" : "infinit_recursion_test2.n_num",
+            "style<>": "o_box.o_style.s_style_inline"
+
+        }, 
+        {
+            "t" : "input" ,
+            "value<>" : "infinit_recursion_test2.n_num",
+            "style<>": "o_box.o_style.s_style_inline"
+
         }, 
         {
             "t": "div", 
@@ -500,6 +542,21 @@ o_json_to_html_demo.s_json_example_with_data = {
             "t" : "span" , 
             // "s_inner_html<>": "text_innerhtml", // ! not working
             "innerHTML<>" : "nested.text",
+        },
+        {
+            "t": "img", 
+            "src": "https://media.4-paws.org/5/4/4/c/544c2b2fd37541596134734c42bf77186f0df0ae/VIER%20PFOTEN_2017-10-20_164-3854x2667-1920x1329.jpg",
+            "style<>":"style_for_img.s_style_inline",
+            'onmousemove':function(event){
+                var n_x_n = event.clientX / window.innerWidth
+                var n_y_n = event.clientY / window.innerHeight
+                // event.target.style.filter = `grayscale(${n_x_n*100}%)`
+                this.style_for_img.s_style_inline = `filter: hue-rotate(${n_y_n*360}deg);`
+                
+                // event.target.style = `filter: hue-rotate(${n_y_n*360}deg);`
+                // console.log(this)
+                // debugger
+            },
         },
         {
             "c":[
