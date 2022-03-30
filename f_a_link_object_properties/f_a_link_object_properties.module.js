@@ -98,27 +98,35 @@ var o_reserved_keyword_properties = {
 var o_proxy_handler = 
 {
     get(object, s_prop){
-        var s_prefix_property_name_for_getter_function_single_property = s_prefix_property_name_for_getter_function + "_" + s_prop
-        //if existing, call the setter function for this property
-        if(object.hasOwnProperty(s_property_name_for_getter_setter_object)){
-            var f_getter_single_prop = object[s_property_name_for_getter_setter_object][s_prefix_property_name_for_getter_function_single_property]
-            var f_getter = object[s_property_name_for_getter_setter_object][s_prefix_property_name_for_getter_function]
-            if(f_getter_single_prop){
-                f_getter_single_prop.apply(
-                    // this// this is the handler, 
-                    object.o_proxy,
-                    [s_prop]
-                )
-            }
-            if(f_getter){
-                f_getter.apply(
-                    // this// this is the handler, 
-                    object.o_proxy,
-                    [s_prop]
-                )
-            }
+        if(!(typeof s_prop === 'symbol')){
 
+            //special objects like element.style / instanceof CSSStyleDeclaration, can have Symbol as property 
+            // Symbol(Symbol.toPrimitive) 
+            // which throws an error
+            var s_prefix_property_name_for_getter_function_single_property = s_prefix_property_name_for_getter_function + "_" + s_prop
+            if(object.hasOwnProperty(s_property_name_for_getter_setter_object)){
+                var f_getter_single_prop = object[s_property_name_for_getter_setter_object][s_prefix_property_name_for_getter_function_single_property]
+                var f_getter = object[s_property_name_for_getter_setter_object][s_prefix_property_name_for_getter_function]
+                if(f_getter_single_prop){
+                    f_getter_single_prop.apply(
+                        // this// this is the handler, 
+                        object.o_proxy,
+                        [s_prop]
+                    )
+                }
+                if(f_getter){
+                    f_getter.apply(
+                        // this// this is the handler, 
+                        object.o_proxy,
+                        [s_prop]
+                    )
+                }
+    
+            }
+            
         }
+
+        //if existing, call the setter function for this property
         return Reflect.get(object, s_prop)
     },
     set(object,s_prop,value){

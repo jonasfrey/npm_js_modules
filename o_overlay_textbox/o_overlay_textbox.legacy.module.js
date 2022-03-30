@@ -32,7 +32,38 @@ class O_overlay_textbox{
         this.n_px_margin = 20
         this.o_cached_s_text_html_content = null
         this.o_element = this.f_o_html_element();
-
+        this.o_data = {
+            o_overlay: {
+                o_position: {
+                    n_x_normalized : 0, 
+                    n_y_normalized : 0, 
+                }, 
+                s_inner_html : '', 
+                o_style: {
+                    s_style_inline: '',
+                    o_css: {
+                      
+                    },
+                    o_getter_setter: {
+                        f_setter: function(value_old, object, s_prop, value){
+                            
+                            if(["s_style_inline", "o_getter_setter"].indexOf(s_prop) == -1){
+                                var s_css = ""
+                                for(var s_key in this.o_css){
+                                    // debugger
+                                    if(["s_style_inline", "o_getter_setter", "a_s_font_family"].indexOf(s_key) == -1){
+                                        s_css += `${s_key}:${this[s_key]};` 
+                                    }
+                                }
+                                // console.log(s_css)
+                                
+                                this.s_style_inline = s_css
+                            }
+                        }
+                    },
+                }
+            }
+        }
         document.body.appendChild(this.o_element)
         this.o_html_element = this.o_element.querySelector("."+this.s_class_name)
 
@@ -88,10 +119,15 @@ class O_overlay_textbox{
     f_o_html_element(){
         return o_json_to_html.f_javascript_object_to_html(
             {
-                t: "div", 
-                c: [
+                s_t: "div", 
+                a_c: [
                     {
                         "class": this.s_class_name,
+                        "s_inner_html<>": "o_overlay.s_inner_html", 
+                        "style": {
+                            "background<>": "o_overlay.o_style.background"
+                        }
+                            // "o_overlay.o_style.s_style_inline"
                     },
                     {
                         "t": "style", 
@@ -117,9 +153,9 @@ class O_overlay_textbox{
                     }
                 ]
             }, 
-            this.o_data
+            this, 
+            "o_data"
         )
-
     }
 
     f_add_event_listeners(){

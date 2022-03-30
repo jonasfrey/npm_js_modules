@@ -9,7 +9,9 @@ import {O_value} from "./f_a_link_object_properties/f_a_link_object_properties.m
 var o_json_to_html = new O_json_to_html()
 
 document.addEventListener('DOMContentLoaded', () => {
-window.o_json_to_html_demo = {}
+window.o_json_to_html_demo = {
+
+} 
 
 o_json_to_html_demo.s_json_example = `{
 
@@ -426,6 +428,20 @@ o_json_to_html_demo.o_data = {
                 }
             }
         }
+    }, 
+    filter_blur: "...",
+    filter1: "...",
+    filter2: "...",
+    "f_o_get_mouse_relative_to_html_element": function(o_html_element){
+
+        let rect = o_html_element.getBoundingClientRect();
+        var n_x_normalized = (window.event.clientX - rect.left) / rect.width
+        var n_y_normalized = (window.event.clientY - rect.top) / rect.height 
+        return {n_x_normalized: n_x_normalized, n_y_normalized: n_y_normalized}
+    }, 
+
+    "style_test_another": {
+        background: "red",
     }
 }
 
@@ -453,7 +469,9 @@ o_json_to_html_demo.s_json_example_with_data = {
         },
         {
             "s_t" : "h3" ,
-            "s_inner_text" : "parse int test",
+            "s_inner_text" : "parse int test1 / infinit recusion test 1",
+            "style<>": "o_box.o_style.s_style_inline"
+
         }, 
         {
             "s_t" : "h3" ,
@@ -527,7 +545,7 @@ o_json_to_html_demo.s_json_example_with_data = {
             "s_t" : "input" , 
             "type" : "text", 
             "value<>" : "nested.text",  
-            "style<o>": "text_style"
+            "style<>": "text_style"
         },
         {
             "s_t" : "span" , 
@@ -538,6 +556,68 @@ o_json_to_html_demo.s_json_example_with_data = {
             "s_t" : "span" , 
             // "s_inner_html<>": "text_innerhtml", // ! not working
             "innerHTML<>" : "nested.text",
+        },
+        {
+
+            "class": "flex_imgs", 
+            "a_c": [
+                {
+                    "s_t": "img",
+                    "class": "flex_img", 
+                    "src": "https://media.4-paws.org/5/4/4/c/544c2b2fd37541596134734c42bf77186f0df0ae/VIER%20PFOTEN_2017-10-20_164-3854x2667-1920x1329.jpg",
+                    "style<>":"style_for_img.s_style_inline",
+                    'onmousemove':function(event){
+                        var o_mouse = this.f_o_get_mouse_relative_to_html_element(event.target); 
+                        var s_css = `filter: hue-rotate(${o_mouse.n_y_normalized*360}deg);`
+                        this.style_for_img.s_style_inline = s_css 
+                        this.filter_blur = s_css
+                        this.filter1 = s_css
+                        this.filter2 = s_css
+                    },
+                },
+                {
+                    "s_t": "img",
+                    "class": "flex_img", 
+                    "src": "https://media.4-paws.org/5/4/4/c/544c2b2fd37541596134734c42bf77186f0df0ae/VIER%20PFOTEN_2017-10-20_164-3854x2667-1920x1329.jpg",
+                    "style<>":"filter_blur",
+                    'onmousemove':function(event){
+                        var o_mouse = this.f_o_get_mouse_relative_to_html_element(event.target); 
+                        var s_css = `filter: blur(${o_mouse.n_y_normalized*50}px);`
+                        this.style_for_img.s_style_inline = s_css 
+                        this.filter_blur = s_css
+                        this.filter1 = s_css
+                        this.filter2 = s_css
+                    },
+                },
+                {
+                    "s_t": "img",
+                    "class": "flex_img", 
+                    "src": "https://media.4-paws.org/5/4/4/c/544c2b2fd37541596134734c42bf77186f0df0ae/VIER%20PFOTEN_2017-10-20_164-3854x2667-1920x1329.jpg",
+                    "style<>":"filter_blur",
+                    'onmousemove':function(event){
+                        var o_mouse = this.f_o_get_mouse_relative_to_html_element(event.target); 
+                        var s_css = `filter: contrast(${o_mouse.n_y_normalized*500}%);`
+                        this.style_for_img.s_style_inline = s_css 
+                        this.filter_blur = s_css
+                        this.filter1 = s_css
+                        this.filter2 = s_css
+                    },
+                },
+                {
+                    "s_t": "img",
+                    "class": "flex_img", 
+                    "src": "https://media.4-paws.org/5/4/4/c/544c2b2fd37541596134734c42bf77186f0df0ae/VIER%20PFOTEN_2017-10-20_164-3854x2667-1920x1329.jpg",
+                    "style<>":"filter_blur",
+                    'onmousemove':function(event){
+                        var o_mouse = this.f_o_get_mouse_relative_to_html_element(event.target); 
+                        var s_css = `filter: invert(${o_mouse.n_y_normalized*100}%);`
+                        this.style_for_img.s_style_inline = s_css 
+                        this.filter_blur = s_css
+                        this.filter1 = s_css
+                        this.filter2 = s_css
+                    },
+                },
+            ]
         },
         {
             "a_c":[
@@ -551,14 +631,14 @@ o_json_to_html_demo.s_json_example_with_data = {
                         {
                             "s_t": "span", 
                             "innerHTML<>":"nested.text", 
-                            "style<o>": "style"
+                            "style<>": "style"
                         }, 
                         {
                             "a_c":[
                                 {
                                     "s_t": "span", 
                                     "innerHTML<>":"nested.text", 
-                                    "style<o>": "style"
+                                    "style<>": "style"
                                 }, 
                                 
                             ]
@@ -566,20 +646,78 @@ o_json_to_html_demo.s_json_example_with_data = {
                     ]
                 }
             ]
+        }, 
+        {
+            "s_t": "button",
+            // "style": {
+            //     "backgroundColor<>": "style_test_another.background"
+            // },
+            "style<>": "style_test_another",
+            "s_inner_text": 'Hey, click maye!', 
+            "onclick": function(){
+                const color = '#' + Math.floor(Math.random() * (0xffffff + 1))
+                .toString(16)
+                .padStart(6, '0')
+                this.style_test_another.background = color
+                console.log(color)
+            }
+        },
+        {
+            "s_t": "style", 
+            "s_inner_html": `
+                .flex_img{
+                    flex:0 0 50%; 
+                    width: 100%;
+                    height: auto; 
+                    /*fckikng flexbox is not working with images...-.-*/
+                    max-width:50%;
+                    
+                }
+                img{
+                }
+                .flex_imgs{
+                    display:flex;
+                    flex-wrap:wrap
+                }
+            `
         }
     ]
 }
 
+
+o_json_to_html_demo.s_json_example_with_data = {
+
+    "style": "display:flex; flex-direction:column",
+    "a_c": [
+        {
+            "s_t": "button",
+            // "style": {
+            //     "backgroundColor<>": "style_test_another.background"
+            // },
+            "style<>": "style_test_another",
+            "s_inner_text": 'Hey, click maye!', 
+            "onclick": function(){
+                const color = '#' + Math.floor(Math.random() * (0xffffff + 1))
+                .toString(16)
+                .padStart(6, '0')
+                this.style_test_another.background = color
+                console.log(color)
+            }
+        },
+
+    ]
+}
+
+
 document.documentElement.appendChild(
     o_json_to_html.f_json_to_html(
-        o_json_to_html_demo.s_json_example_with_data, 
-        o_json_to_html_demo.o_data, 
+        o_json_to_html_demo.s_json_example_with_data,
+        // o_json_to_html_demo.s_json_example_with_data2,
+        o_json_to_html_demo, // data parent object, 
+        "o_data", // data parent object property name
     )
 )
 });
-
-
-
 
 
 // readme.md stuff

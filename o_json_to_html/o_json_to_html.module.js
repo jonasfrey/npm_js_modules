@@ -46,10 +46,8 @@ class O_json_to_html {
         return o_return
     }
 
-    f_recursive_convert_object_to_html_element(object,  o_data = null){
+    f_recursive_convert_object_to_html_element(object,  o_data_parent = null, s_prop_name_on_o_data_parent = null){
         
-
-
         var s_tag_name = object[this.s_prop_name_tag_name]
         s_tag_name = (s_tag_name) ? s_tag_name : this.s_default_tag_name
 
@@ -65,7 +63,6 @@ class O_json_to_html {
             // handle linking 
             var a_o_string_endings = [
                 { "s_ending": this.s_link_property_suffix, "b_endsWith":s_prop_name.endsWith(this.s_link_property_suffix)},
-                { "s_ending": "<o>", "b_endsWith":s_prop_name.endsWith("<o>")}
             ]
             var o_string_ending = a_o_string_endings.filter(o=>o.b_endsWith)[0]
 
@@ -79,8 +76,8 @@ class O_json_to_html {
                 // which points to a nested object, for example 'color.rgba.r'
                 // so we have to get the parent object 'color.rgba' and the propname 'r'
                 var o_resolved_dotnotation = this.f_get_object_and_property_by_dot_notation(
-                    o_data, 
-                    this.s_default_o_data_first_property + "." + s_prop_name_o_data_for_linking
+                    o_data_parent, 
+                    s_prop_name_on_o_data_parent + "." + s_prop_name_o_data_for_linking
                 );
                 
                 if(!o_resolved_dotnotation.o_object.o_object || !o_resolved_dotnotation.o_object_parent.o_object){
@@ -91,14 +88,24 @@ class O_json_to_html {
                 var o_data_resolved_parent = o_resolved_dotnotation.o_object_parent.o_object
                 var s_prop_o_data_resolved = o_resolved_dotnotation.o_object.s_prop
                 var s_prop_o_data_resolved_parent = o_resolved_dotnotation.o_object_parent.s_prop
-                // debugger
-                if(o_string_ending.s_ending == "<>"){
-                    // console.log(
-                    //     o_data_resolved, 
-                    //     s_prop_o_data_resolved,
-                    //     o_html_element, 
-                    //     s_prop_name_o_html_element,
-                    // )
+                
+                if(
+                    !Array.isArray(o_data_resolved[s_prop_o_data_resolved]) && typeof o_data_resolved[s_prop_o_data_resolved] == "object"
+                    ){
+                        // debugger
+                    for(var s_prop in o_data_resolved[s_prop_o_data_resolved]){
+
+                        var a_objs = f_a_link_object_properties(
+                            o_html_element[s_prop_name_o_html_element], 
+                            s_prop,
+                            o_data_resolved[s_prop_o_data_resolved], 
+                            s_prop,
+                        )
+                    }
+                    // debugger
+                    o_data_resolved[s_prop_o_data_resolved] = o_data_resolved[s_prop_o_data_resolved].o_proxy
+                }else{
+
                     var a_objs = f_a_link_object_properties(
                         // the order is important!
                         o_data_resolved, 
@@ -106,21 +113,15 @@ class O_json_to_html {
                         o_html_element, 
                         s_prop_name_o_html_element,
                     )
-
+    
                     //the data object must be a Proxy
                     // since we cannot change the reference by the param variable 
                     // o_data_resolved = a_objs[0] // a_objs[0] is a proxy!
                     // o_data_resolved_parent[s_prop_o_data_resolved_parent] = a_objs[0]
                     o_data_resolved_parent[s_prop_o_data_resolved_parent] = o_data_resolved_parent[s_prop_o_data_resolved_parent].o_proxy
-  
-                }
                 
-                if(o_string_ending.s_ending == "<o>"){
-                    //link objects aka use reference
-                    o_data[this.s_default_o_data_first_property + "." + s_prop_name_o_data_for_linking] = o_html_element[s_prop_name_o_html_element]
-                    // for linking a html style object to a data object
-                    // o_html_element[s_prop_name_o_html_element] = o_data_for_linking[s_prop_name_o_data_for_linking]
                 }
+
                 // inputs on input elements wont trigger setter function 
                 if(
                     object[this.s_prop_name_tag_name]
@@ -139,11 +140,14 @@ class O_json_to_html {
             // handle functions
             if(typeof value === "function"){
                 // value.apply
-                if(o_string_ending?.s_ending == "<>"){
-                    object[s_prop_name] = value.apply(o_data_parent[s_o_data_parent])
-                }
+                // we could execute the function once on the first rendering, 
+                // if(o_string_ending?.s_ending == "<>"){
+                //     object[s_prop_name] = value.apply(o_data_parent[s_prop_name_on_o_data_parent])
+                // }
+
                 //excluding onclick, onmousemove etc.
                 if(s_prop_name.indexOf("on") == -1){
+                    // debugger
                     object[s_prop_name] = value.apply(object)
                 }
                 // debugger
@@ -165,10 +169,22 @@ class O_json_to_html {
                     // console.log(value)
                     var f_value = value 
                     o_html_element.addEventListener(s_prop_name.substring(2), function(event){
-                        f_value.apply(self.o_data, [event])
+                        f_value.apply(
+                            o_data_parent[s_prop_name_on_o_data_parent],
+                            [event]
+                        )
                     })
                     // o_html_element[s_prop_name] = value
                 }else{
+                    // if(
+                    //     // style object is a special case
+                    //     (s_prop_name == "style") &&
+                    //     !Array.isArray(value) && typeof value == "object"
+                    // ){
+
+                    //     debugger
+                    //     o_html_element[s_prop_name] = this.f_recursive_convert_object_to_html_element(value, o_data_parent, s_prop_name_on_o_data_parent)
+                    // }
                     // console.log(s_prop_name)
                     // console.log(value)
                     o_html_element.setAttribute(s_prop_name, value)
@@ -190,7 +206,7 @@ class O_json_to_html {
                     Array.isArray(o_child) == false &&
                     typeof o_child === "object"
                     ){
-                    var o_child_html_element = this.f_recursive_convert_object_to_html_element(o_child, o_data)
+                    var o_child_html_element = this.f_recursive_convert_object_to_html_element(o_child, o_data_parent, s_prop_name_on_o_data_parent)
                     o_html_element.appendChild(o_child_html_element)
                 }
             }
@@ -242,25 +258,24 @@ class O_json_to_html {
         return obj;
     }
 
-    f_json_or_jsobject_to_html(value, o_data = null){
-        this.o_data = o_data
-        return this.f_recursive_convert_object_to_html_element(
+    f_json_or_jsobject_to_html(value, o_data_parent = null, s_prop_name_on_o_data_parent = null){
+
+
+        var obj = this.f_recursive_convert_object_to_html_element(
             this.f_convert_string_to_javascript_object(value),
-            this.f_prepend_dotnotaion_to_o_data(o_data)
+            o_data_parent, 
+            s_prop_name_on_o_data_parent
         )
+
+        
+        return obj
         
     }
-    f_json_to_html(value,  o_data = null){
-        return this.f_json_or_jsobject_to_html(value, o_data)
+    f_json_to_html(value,  o_data_parent = null, s_prop_name_on_o_data_parent = null){
+        return this.f_json_or_jsobject_to_html(value, o_data_parent,s_prop_name_on_o_data_parent)
     }
-    f_javascript_object_to_html(value,  o_data = null){ 
-        return this.f_json_or_jsobject_to_html(value, o_data)
-    }
-    f_prepend_dotnotaion_to_o_data(o_data = null){
-        //o_data
-        var object = {}
-        object[this.s_default_o_data_first_property] = o_data
-        return object
+    f_javascript_object_to_html(value,  o_data_parent = null, s_prop_name_on_o_data_parent = null){ 
+        return this.f_json_or_jsobject_to_html(value, o_data_parent,s_prop_name_on_o_data_parent)
     }
     f_convert_string_to_javascript_object(value){
         // if not yet an object, convert to one
