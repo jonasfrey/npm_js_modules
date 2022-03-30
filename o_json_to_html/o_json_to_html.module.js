@@ -5,12 +5,12 @@ import {f_a_link_object_properties, f_add_property_o_proxy} from "./../f_a_link_
 
 class O_json_to_html {
     constructor(){
-        this.s_tag_property_name = "t"
-        this.s_children_elements_property_name = "c"
-        this.s_default_tag_name = "div"
-        this.s_tag_inner_html = "s_inner_html"
-        this.s_tag_inner_text = "s_inner_text"
+        this.s_prop_name_tag_name = "s_t"
+        this.s_prop_name_children_elements = "a_c"
+        this.s_prop_name_inner_html = "s_inner_html"
+        this.s_prop_name_inner_text = "s_inner_text"
         this.s_link_property_suffix = "<>", 
+        this.s_default_tag_name = "div"
         this.s_default_o_data_first_property = "o_data"
         this.o_data = null
     }
@@ -50,7 +50,7 @@ class O_json_to_html {
         
 
 
-        var s_tag_name = object[this.s_tag_property_name]
+        var s_tag_name = object[this.s_prop_name_tag_name]
         s_tag_name = (s_tag_name) ? s_tag_name : this.s_default_tag_name
 
         var o_html_element = document.createElement(s_tag_name)
@@ -123,9 +123,9 @@ class O_json_to_html {
                 }
                 // inputs on input elements wont trigger setter function 
                 if(
-                    object[this.s_tag_property_name]
+                    object[this.s_prop_name_tag_name]
                 ){
-                    if(object[this.s_tag_property_name] == "input"){
+                    if(object[this.s_prop_name_tag_name] == "input"){
                         o_html_element.addEventListener("input", function(){
                             // console.log(this.value)
                             window.o_element = this
@@ -151,11 +151,11 @@ class O_json_to_html {
 
             //handle static properties
             if(
-                s_prop_name != this.s_tag_property_name &&
-                s_prop_name != this.s_children_elements_property_name &&
+                s_prop_name != this.s_prop_name_tag_name &&
+                s_prop_name != this.s_prop_name_children_elements &&
                 s_prop_name != this.s_default_tag_name &&
-                s_prop_name != this.s_tag_inner_html &&
-                s_prop_name != this.s_tag_inner_text &&
+                s_prop_name != this.s_prop_name_inner_html &&
+                s_prop_name != this.s_prop_name_inner_text &&
                 !o_string_ending
                 ){
 
@@ -182,7 +182,7 @@ class O_json_to_html {
         // f_add_property_o_proxy(o_data); 
 
         // handle childre
-        var a_o_child_object = object[this.s_children_elements_property_name]
+        var a_o_child_object = object[this.s_prop_name_children_elements]
         if(a_o_child_object){
             for(var n_index_a_o_child_object in a_o_child_object){
                 var o_child = a_o_child_object[n_index_a_o_child_object]    
@@ -197,11 +197,11 @@ class O_json_to_html {
         }
 
         // handle innerText innerHTML
-        var s_inner_text = object[this.s_tag_inner_text]
+        var s_inner_text = object[this.s_prop_name_inner_text]
         if(s_inner_text){
             o_html_element.innerText = s_inner_text
         }
-        var s_inner_html = object[this.s_tag_inner_html]
+        var s_inner_html = object[this.s_prop_name_inner_html]
         if(s_inner_html){
             o_html_element.innerHTML = s_inner_html
         }
@@ -232,10 +232,10 @@ class O_json_to_html {
         }
 
         if(a_o_child_object.length >0){
-          obj[this.s_children_elements_property_name] = a_o_child_object;
+          obj[this.s_prop_name_children_elements] = a_o_child_object;
         }else{
           if(o_html_element.innerText != ""){
-            obj[this.s_tag_inner_text] = o_html_element.innerText;
+            obj[this.s_prop_name_inner_text] = o_html_element.innerText;
           }
         }
       
@@ -280,6 +280,5 @@ class O_json_to_html {
         return this.f_json_to_html()
     }
 }
-var o_json_to_html = new O_json_to_html()
 
-export default o_json_to_html
+export default O_json_to_html

@@ -1,12 +1,12 @@
 // import o_overlay_textbox from "./o_overlay_textbox/o_overlay_textbox.module.js"
 
-import o_json_to_html from "./o_json_to_html/o_json_to_html.module.js"
+import O_json_to_html from "./o_json_to_html/o_json_to_html.module.js"
 
 import {O_value} from "./f_a_link_object_properties/f_a_link_object_properties.module.js"
 
 // demo 
 
-
+var o_json_to_html = new O_json_to_html()
 
 document.addEventListener('DOMContentLoaded', () => {
 window.o_json_to_html_demo = {
@@ -16,18 +16,18 @@ window.o_json_to_html_demo = {
 o_json_to_html_demo.s_json_example = `{
 
 "style": "display:flex; flex-direction:column",
-"c": [
+"a_c": [
     {
-        "t" : "input" , 
+        "s_t" : "input" , 
         "type" : "text", 
         "value" : "i am an input"
     },
     {
-        "t" : "div" , 
+        "s_t" : "div" , 
         "style": "display:flex",
-        "c":[
+        "a_c":[
             {
-                "t": "h1", 
+                "s_t": "h1", 
                 "s_inner_text" : "<i style='color:red' class='fa fa-sun'>i am not parsed</i>"
             }, 
             {
@@ -36,7 +36,7 @@ o_json_to_html_demo.s_json_example = `{
         ]
     }, 
     {
-        "t": "img", 
+        "s_t": "img", 
         "src": "https://media.4-paws.org/5/4/4/c/544c2b2fd37541596134734c42bf77186f0df0ae/VIER%20PFOTEN_2017-10-20_164-3854x2667-1920x1329.jpg"
     }
 ]
@@ -46,27 +46,27 @@ o_json_to_html_demo.o_object_example = {
     // since this is a javascript object we can have ...
     quoteless_property_name: "yes indeed", //...quoteless property names
     "style": "display:flex;flex-direction:column", // ...comments aswell !
-    "c": [
+    "a_c": [
         {
-            t: "h1", 
+            s_t: "h1", 
             s_inner_html: "5+5",
         },
         {
-            t: "h2", 
+            s_t: "h2", 
             s_inner_html: function(){
                 return 5+5
             },
         },
         {
-            "t" : "div" , 
+            "s_t" : "div" , 
             "style": "display:flex",
-            "c":[
+            "a_c":[
                 {
-                    "t": "h1", 
+                    "s_t": "h1", 
                     "s_inner_text" : "<i style=\"color:red\" class=\"fa fa-sun\">i am not parsed</i>"
                 }, 
                 {
-                    "t": "h1", 
+                    "s_t": "h1", 
                     "s_inner_html" : "<i style=\"color:blue\" class=\"fa fa-sun\">i am parsed</i>"
                 }, 
                 {
@@ -79,7 +79,7 @@ o_json_to_html_demo.o_object_example = {
             ]
         }, 
         {
-            "t": "img", 
+            "s_t": "img", 
             "src": "https://media.4-paws.org/5/4/4/c/544c2b2fd37541596134734c42bf77186f0df0ae/VIER%20PFOTEN_2017-10-20_164-3854x2667-1920x1329.jpg"
         }
     ]
@@ -416,9 +416,9 @@ o_json_to_html_demo.o_data = {
 o_json_to_html_demo.s_json_example_with_data = {
 
     "style": "display:flex; flex-direction:column",
-    "c": [
+    "a_c": [
         {
-            "t": "button", 
+            "s_t": "button", 
             "s_inner_text": "click me", 
             "onclick": function(){
                 const color = '#' + Math.floor(Math.random() * (0xffffff + 1))
@@ -436,19 +436,19 @@ o_json_to_html_demo.s_json_example_with_data = {
             }
         },
         {
-            "t" : "h3" ,
+            "s_t" : "h3" ,
             "s_inner_text" : "parse int test",
         }, 
         {
-            "t" : "h3" ,
+            "s_t" : "h3" ,
             "innerText<>" : "parse_int_test.n_num",
         }, 
         {
-            "t" : "input" ,
+            "s_t" : "input" ,
             "value<>" : "parse_int_test.n_num",
         }, 
         {
-            "t": "div", 
+            "s_t": "div", 
             "class": "o_box", 
             "s_inner_text": "hellow", 
             // "dummy<>": "o_box.o_style.o_css.padding", 
@@ -456,18 +456,18 @@ o_json_to_html_demo.s_json_example_with_data = {
         },
 
         {
-            "t" : "h2" , 
+            "s_t" : "h2" , 
             // "s_inner_html<>": "text_innerhtml", // ! not working
             "innerHTML<>" : "nested.text",
             "style<>": "o_box.o_style.s_style_inline"
         },
         {
-            "t" : "h1" ,
+            "s_t" : "h1" ,
             // "s_inner_html<>": "text_innerhtml", // ! not working
             "innerText<>" : "text_input",
         }, 
         {
-            "t" : "input",
+            "s_t" : "input",
             "type":"range", 
             "min": 1, 
             "max": 40, 
@@ -479,46 +479,46 @@ o_json_to_html_demo.s_json_example_with_data = {
             "innerText<>" : "text_input",
         }, 
         {
-            "t" : "input",
+            "s_t" : "input",
             "style<>": "o_box.o_style.s_style_inline",
             // "s_inner_html<>": "text_innerhtml", // ! not working
             "value<>" : "o_box.o_style['font-size']",
         },
         {
 
-            "t" : "input" , 
+            "s_t" : "input" , 
             "type" : "text", 
             "value<>" : "nested.text",  
             "style<o>": "text_style"
         },
         {
-            "t" : "span" , 
+            "s_t" : "span" , 
             // "s_inner_html<>": "text_innerhtml", // ! not working
             "innerHTML<>" : "text_input",
         },
         {
-            "t" : "span" , 
+            "s_t" : "span" , 
             // "s_inner_html<>": "text_innerhtml", // ! not working
             "innerHTML<>" : "nested.text",
         },
         {
-            "c":[
+            "a_c":[
                 {
-                    "t": "span", 
+                    "s_t": "span", 
                     "innerHTML<>":"nested.text", 
                     "style": "color:red"
                 }, 
                 {
-                    "c":[
+                    "a_c":[
                         {
-                            "t": "span", 
+                            "s_t": "span", 
                             "innerHTML<>":"nested.text", 
                             "style<o>": "style"
                         }, 
                         {
-                            "c":[
+                            "a_c":[
                                 {
-                                    "t": "span", 
+                                    "s_t": "span", 
                                     "innerHTML<>":"nested.text", 
                                     "style<o>": "style"
                                 }, 
@@ -541,3 +541,8 @@ document.documentElement.appendChild(
 });
 
 
+
+
+
+// readme.md stuff
+// # convert json to html 

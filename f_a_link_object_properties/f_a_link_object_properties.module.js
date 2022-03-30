@@ -176,7 +176,7 @@ var o_proxy_handler =
 
                 }
             }
-        debugger
+        
         if(o_value.a_o_object.indexOf(object) == -1 && !o_value.b_dont_call_f_setter){
 
             //if existing, call the getter function for this property
