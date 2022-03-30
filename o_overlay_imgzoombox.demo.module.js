@@ -79,11 +79,12 @@ var o_html = o_json_to_html.f_javascript_object_to_html(
     }
 
 )
+
 document.body.appendChild(o_html)
 
 
 var o_overlay_imgzoombox = new O_overlay_imgzoombox()
-var o_overlay_imgzoombox = new O_overlay_imgzoombox()
+// var o_overlay_imgzoombox = new O_overlay_imgzoombox()
 
 window.o_overlay_imgzoombox = o_overlay_imgzoombox
 

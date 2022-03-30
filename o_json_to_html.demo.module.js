@@ -362,13 +362,63 @@ o_json_to_html_demo.o_data = {
     text_innerhtml: "logogogogos", 
     nested: {
         "text": "asdf"
-    }
+    }, 
+    o_box: {
+        o_style: {
+            o_css: {
+                "background-color": "red", 
+                "padding": "20px", 
+                "border": "5px solid blue"
+            },
+            n_left: 0,
+            n_top: 0,
+            o_getter_setter: {
+                f_setter: function(value_old, object, s_prop, value){
+                    // debugger 
+                    if(s_prop != "s_style_inline"){
+                        var s_css = ""
+                        for(var s_key in this.o_css){
+                            // debugger
+                            s_css += `${s_key}:${this.o_css[s_key]};` 
+                        }
+                        console.log(s_css)
+                        
+                        this.s_style_inline = s_css
+                    }
+                }
+            },
+            s_style_inline: "background-image:url(...)"
+        },
+    },
 }
 
 o_json_to_html_demo.s_json_example_with_data = {
 
     "style": "display:flex; flex-direction:column",
     "c": [
+        {
+            "t": "button", 
+            "s_inner_text": "click me", 
+            "onclick": function(){
+                const color = '#' + Math.floor(Math.random() * (0xffffff + 1))
+                .toString(16)
+                .padStart(6, '0') 
+                
+                // this.o_box.o_style.o_css needs to be a proxy// not so sure
+                this.o_box.o_style.o_css["background-color"] = color
+                this.o_box.o_style.o_css.padding = Math.random()*40+"px"
+                this.o_box.o_style.o_css.border = Math.random()*10+"px solid red"
+                // trigger the f_setter
+                this.o_box.o_style.n_left = 2 
+            }
+        },
+        {
+            "t": "div", 
+            "class": "o_box", 
+            "s_inner_text": "hellow", 
+            // "dummy<>": "o_box.o_style.o_css.padding", 
+            "style<>": "o_box.o_style.s_style_inline"
+        },
         {
             "t" : "h2" , 
             // "s_inner_html<>": "text_innerhtml", // ! not working
@@ -433,3 +483,5 @@ document.documentElement.appendChild(
     )
 )
 });
+
+

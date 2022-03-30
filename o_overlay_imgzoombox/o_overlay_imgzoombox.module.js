@@ -58,7 +58,14 @@ class O_overlay_imgzoombox{
             o_overlay_box: {
                 o_style: {
                     n_left: 0,
-                    n_top: 0, 
+                    n_top: 0,
+                    o_getter_setter: {
+                        f_setter: function(value_old, object, s_prop, value){
+                            if(s_prop != "s_style_inline"){
+                                console.log('asdf')
+                            }
+                        }
+                    },
                     s_style_inline: "background-image:url(...)"
                 },
             },
@@ -504,6 +511,8 @@ class O_overlay_imgzoombox{
                                 padding: 0.9rem;
                                 max-width: ${this.n_px_max_width}px;
                                 font-family: arial;
+                                top:0; 
+                                left:0;
                             }
                             .${this.s_class_name} p{
                                 margin: auto;

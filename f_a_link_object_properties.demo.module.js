@@ -89,7 +89,7 @@ import f_a_link_object_properties from "./f_a_link_object_properties/f_a_link_ob
 // }
 // f_demos()
 
-var a = {
+window.a = {
     s_test: "tau is bigger than pi", 
     s_a_stringified: ""
 }
@@ -135,15 +135,23 @@ o_container.appendChild(o_input)
 
 //link properties
 
+// important , after the funciton was executed, the original objects 
+// have to be replaced with the proxy object
 var a_objs = f_a_link_object_properties(
     a, 
     "s_test", 
     o_input, 
     "value",
 )
+a = a_objs[0] // same as: a = a.o_proxy
+a = a.o_proxy // same as: a = returned_array[0]
 
-a = a_objs[0]
-// o_input = a_objs[1]
+f_a_link_object_properties(
+    a, 
+    "s_test", 
+    o_input, 
+    "value",
+)
 
 var a_objs = f_a_link_object_properties(
     a, 
@@ -152,11 +160,6 @@ var a_objs = f_a_link_object_properties(
     "innerText",
 )
 
-o_input.oninput = function(){
-    console.log(JSON.stringify(a))
-    a.s_a_stringified = JSON.stringify(a)
-}
-
 
 var a_objs = f_a_link_object_properties(
     a, 
@@ -164,6 +167,10 @@ var a_objs = f_a_link_object_properties(
     o_labels_test, 
     "innerHTML",
 )
+o_input.oninput = function(){
+    console.log(JSON.stringify(a))
+    a.s_a_stringified = JSON.stringify(a)
+}
 var o_style = document.createElement("style"); 
 o_style.textContent = `
 label.o_labela {}
@@ -222,45 +229,43 @@ window.o_data = {
         f_getter_n_number_integer: function(){
             console.log(`there was an access on the object ${this} on the property n_number_integer`)
         }, 
-        f_setter_n_number_integer: function(s_prop, value, value_old, self){
-            console.log(this)
-            console.log(self)
-            var thisself = this
-            var val = self[s_prop]
-            window.setTimeout(function(){
-                // thisself.n_number_integer = parseInt(this.n_number_integer)
-                o_data.n_number_integer = parseInt(val)
-            },1000)
+        f_setter_n_number_integer: function(
+            value_old, // the old value
+            o_object, // the object/target not the proxy
+            s_prop, // the property
+            value_new // the new value, is the same as o_object[s_prop]
+        ){
+            console.log("setter called")
+            // "this" is the object.o_proxy
+            // 
+            // we have to be careful, not to 
+            // set the same property , which would leed to max stack size exceeded
+            // since it would be a infinity recursion
+            
+            // wont work
+            // this.n_number_integer = parseInt(this.n_number_integer)
 
+            // a weak boolean lock could be used, but would not prevent 
+            // asynchrounus functions from causing infinity recursion
+            // 
+            // var self = this
+            // window.setTimeout(function(){
+            //     self.n_number_integer = parseInt(self.n_number_integer)
+            // },1000)
         }
     }
 }
 
-// var a_objs = f_a_link_object_properties(
-//     // o_data, 
-//     // "n_number_integer", 
-//     // o_input_parseint, 
-//     // "value",
-//     //reversed order
-//     o_input_parseint, 
-//     "value",
-//     o_data,
-//     "n_number_integer", 
-// )
+
 
 var a_objs = f_a_link_object_properties(
-    // o_data, 
-    // "n_number_integer", 
-    // o_input_parseint, 
-    // "value",
-    //reversed order
     o_data,
     "n_number_integer", 
     o_input_parseint, 
     "value",
 )
-window.o_data = a_objs[0]
 
+o_data = o_data.o_proxy
 
 
 // // example of object

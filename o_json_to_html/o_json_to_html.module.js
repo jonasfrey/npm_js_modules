@@ -1,7 +1,7 @@
 //production 
 // import f_a_link_object_properties from "https://unpkg.com/f_a_link_object_properties@1.0.2/f_a_link_object_properties.module.js"
 //development 
-import f_a_link_object_properties from "./../f_a_link_object_properties/f_a_link_object_properties.module.js"
+import {f_a_link_object_properties, f_add_property_o_proxy} from "./../f_a_link_object_properties/f_a_link_object_properties.module.js"
 
 class O_json_to_html {
     constructor(){
@@ -12,6 +12,7 @@ class O_json_to_html {
         this.s_tag_inner_text = "s_inner_text"
         this.s_link_property_suffix = "<>", 
         this.s_default_o_data_first_property = "o_data"
+        this.o_data = null
     }
 
     f_get_object_and_property_by_dot_notation(o_object, s_dotnotation){
@@ -47,6 +48,8 @@ class O_json_to_html {
 
     f_recursive_convert_object_to_html_element(object,  o_data = null){
         
+
+
         var s_tag_name = object[this.s_tag_property_name]
         s_tag_name = (s_tag_name) ? s_tag_name : this.s_default_tag_name
 
@@ -105,13 +108,11 @@ class O_json_to_html {
                     )
 
                     //the data object must be a Proxy
-                    //since we cannot change the reference by the param variable 
-                    // in this scope, we need the parent and its property name 
-                    // to change the reference
-                    // otherwise we could simply do o_data = a_objs[0]
-                    o_data_resolved_parent[s_prop_o_data_resolved_parent] = a_objs[0]
-                    
-                    // console.log(o_data_for_linking)
+                    // since we cannot change the reference by the param variable 
+                    // o_data_resolved = a_objs[0] // a_objs[0] is a proxy!
+                    // o_data_resolved_parent[s_prop_o_data_resolved_parent] = a_objs[0]
+                    o_data_resolved_parent[s_prop_o_data_resolved_parent] = o_data_resolved_parent[s_prop_o_data_resolved_parent].o_proxy
+  
                 }
                 
                 if(o_string_ending.s_ending == "<o>"){
@@ -141,7 +142,10 @@ class O_json_to_html {
                 if(o_string_ending?.s_ending == "<>"){
                     object[s_prop_name] = value.apply(o_data_parent[s_o_data_parent])
                 }
-                object[s_prop_name] = value.apply(object)
+                //excluding onclick, onmousemove etc.
+                if(s_prop_name.indexOf("on") == -1){
+                    object[s_prop_name] = value.apply(object)
+                }
                 // debugger
             }
 
@@ -155,12 +159,24 @@ class O_json_to_html {
                 !o_string_ending
                 ){
 
-                o_html_element.setAttribute(s_prop_name, value)
+                if(typeof value === "function"){
+                    var self = this
+                    //onclick , onmousemove, onwheel, etc functions
+                    
+                    o_html_element.addEventListener(s_prop_name.substring(2), function(){
+                      value.apply(self.o_data)  
+                    })
+                    // o_html_element[s_prop_name] = value
+                }else{
+                    o_html_element.setAttribute(s_prop_name, value)
+                }
 
             }
 
 
         }
+        // // we have to add a proxy
+        // f_add_property_o_proxy(o_data); 
 
         // handle childre
         var a_o_child_object = object[this.s_children_elements_property_name]
@@ -223,18 +239,19 @@ class O_json_to_html {
         return obj;
     }
 
-    f_json_to_html(value,  o_data = null){
-        
+    f_json_or_jsobject_to_html(value, o_data = null){
+        this.o_data = o_data
         return this.f_recursive_convert_object_to_html_element(
             this.f_convert_string_to_javascript_object(value),
             this.f_prepend_dotnotaion_to_o_data(o_data)
         )
+        
+    }
+    f_json_to_html(value,  o_data = null){
+        return this.f_json_or_jsobject_to_html(value, o_data)
     }
     f_javascript_object_to_html(value,  o_data = null){ 
-        return this.f_recursive_convert_object_to_html_element(
-            this.f_convert_string_to_javascript_object(value),
-            this.f_prepend_dotnotaion_to_o_data(o_data)
-        )
+        return this.f_json_or_jsobject_to_html(value, o_data)
     }
     f_prepend_dotnotaion_to_o_data(o_data = null){
         //o_data
