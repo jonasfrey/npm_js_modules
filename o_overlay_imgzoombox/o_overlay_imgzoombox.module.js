@@ -13,14 +13,15 @@
 //     // console.log(marked)
 // })();
 
-// import "https://cdnjs.cloudflare.com/ajax/libs/marked/4.0.2/marked.min.js"
+import "https://cdnjs.cloudflare.com/ajax/libs/marked/4.0.2/marked.min.js"
 // development: 
-import o_json_to_html from "../o_json_to_html/o_json_to_html.module.js";
+import O_json_to_html from "../o_json_to_html/o_json_to_html.module.js";
 
 class O_overlay_imgzoombox{
 
     constructor(){
         var self = this 
+        this.o_json_to_html = new O_json_to_html()
         this.s_class_name = this.constructor.name.toLowerCase() 
         this.s_attribute_name = "s_"+this.constructor.name.toLowerCase() 
         this.n_px_max_width = 350;
@@ -57,21 +58,13 @@ class O_overlay_imgzoombox{
             },
             o_overlay_box: {
                 o_style: {
-                    n_left: 0,
-                    n_top: 0,
-                    o_getter_setter: {
-                        f_setter: function(value_old, object, s_prop, value){
-                            if(s_prop != "s_style_inline"){
-                                console.log('asdf')
-                            }
-                        }
-                    },
-                    s_style_inline: "background-image:url(...)"
+                    "left": 0,
+                    "top": 0,
                 },
             },
             o_img_preview: {
+                n_scale_factor : 1, // 500% 
                 o_style: {
-                    n_scale_factor : 1, // 500% 
                     s_style_inline: "background-image:url(...)"
                 },
                 n_zoom_factor:1,
@@ -361,13 +354,13 @@ class O_overlay_imgzoombox{
         } 
     }
     f_o_html_element(){
-        return o_json_to_html.f_javascript_object_to_html(
+        return this.o_json_to_html.f_javascript_object_to_html(
             {
                 t: "div", 
                 c: [
                     {
                         "class": this.s_class_name,
-                        "style<>": "o_overlay_box.o_style.s_style_inline",
+                        "style<>": "o_overlay_box.o_style",
                         "c": [
                             {
                                 "class": "top bar", 

@@ -1,21 +1,22 @@
-import o_overlay_textbox from "./o_overlay_textbox/o_overlay_textbox.module.js"
-import o_json_to_html from "./o_json_to_html/o_json_to_html.module.js"
-
-document.body.appendChild(o_json_to_html.f_javascript_object_to_html(
+import O_overlay_textbox from "./o_overlay_textbox/o_overlay_textbox.module.js"
+import O_json_to_html from "./o_json_to_html/o_json_to_html.module.js"
+var o_json_to_html = new O_json_to_html()
+var o_overlay_textbox = new O_overlay_textbox()
+var el = (o_json_to_html.f_javascript_object_to_html(
     {
-        c: [
+        a_c: [
             {
-                t: "h1", 
+                s_t: "h1", 
                 "s_inner_text": "hover some elements!", 
                 "s_o_overlay_textbox": "this is a simple heading"
             }, 
             {
-                t: "img", 
+                s_t: "img", 
                 "src": "https://ichef.bbci.co.uk/news/976/cpsprodpb/02C2/production/_122360700_gettyimages-1280424615.jpg", 
                 "s_o_overlay_textbox": "Koalas are a protected species in Australia's state of Victoria"
             }, 
             {
-                t: "img", 
+                s_t: "img", 
                 "src": "https://upload.wikimedia.org/wikipedia/commons/7/79/2010-brown-bear.jpg", 
                 "s_o_overlay_textbox": `### Description
 Bears are carnivoran mammals of the family Ursidae. They are classified as caniforms, or doglike carnivorans. Although only eight species of bears are extant, they are widespread, appearing in a wide variety of habitats throughout the Northern Hemisphere and partially in the Southern Hemisphere. [Wikipedia](https://en.wikipedia.org/wiki/Bear)
@@ -36,20 +37,35 @@ Bears are carnivoran mammals of the family Ursidae. They are classified as canif
                 `.trim()
             }, 
             {
-                t: "img", 
+                s_t: "img", 
                 "src": "https://images.unsplash.com/photo-1535591273668-578e31182c4f?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&ixid=eyJhcHBfaWQiOjM2NTI5fQ", 
                 "s_o_overlay_textbox": "Clownfish or anemonefish are fishes from the subfamily Amphiprioninae in the family Pomacentridae. Thirty species are recognized: one in the genus Premnas, while the remaining are in the genus Amphiprion. In the wild, they all form symbiotic mutualisms with sea anemones. Wikipedia"
             }, 
             {
-                t: "h1", 
+                s_t: "h1", 
                 "s_inner_text": "tau vs pi", 
                 "s_o_overlay_textbox": "|test|1|\n|---|---|\n|222|adsf|"
+            }, 
+            {
+                "s_t": "style", 
+                "s_inner_html": `
+                    body{
+                        background: rgba(1,1,2,0.8);
+                        color: rgba(11,235,81, 0.9);
+                    }
+                    img{
+                        max-width: 300px
+                    }
+                `
+                // .split("\n").join("")
             }
         ]
     }
 
 ))
 
+
+document.body.appendChild(el)
 var el = document.createElement("h2")
 el.innerText = "tau vs pi asdf"
 el.setAttribute(
@@ -57,5 +73,3 @@ el.setAttribute(
     "|test|1|\n|---|---|\n|222|adsf|"
     )
 document.documentElement.appendChild(el)
-
-window.o_overlay_textbox = o_overlay_textbox
