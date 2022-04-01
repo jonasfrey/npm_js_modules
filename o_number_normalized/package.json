@@ -1,0 +1,28 @@
+{
+  "name": "o_number_normalized",
+  "version": "1.0.3",
+  "description": "",
+  "main": "o_number_normalized.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "math_tau_module": "^1.0.3"
+  },
+  "keywords": [
+    "convert number",
+    "degrees2radians",
+    "latitude",
+    "longitude",
+    "ra",
+    "dec",
+    "alt",
+    "az",
+    "degrees to radians",
+    "radians to degrees",
+    "number converter",
+    "number normalization"
+  ]
+}
