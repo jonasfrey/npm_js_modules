@@ -131,6 +131,6 @@ removed some unneccessary `console.log` stuff
 ## 1.0.3
 adding `package.json` keywords
 ## 1.0.4 
-documentation updates
-## 1.0.5 
-added the possibility to convert with a function and to extend the function name pattern 
+- documentation updates
+- added the possibility to convert with a function 
+- added the possibility to add a custom function name pattern for converting numbers via funciton call

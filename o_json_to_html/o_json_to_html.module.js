@@ -15,7 +15,7 @@ class O_json_to_html {
         this.o_data = null
     }
 
-    f_get_object_and_property_by_dot_notation(o_object, s_dotnotation){
+    f_o_get_object_and_property_by_dot_notation(o_object, s_dotnotation){
         var o_object_original = o_object
         // s_dotnotation my_object.some_obj.position.z => object => my_object.some_obj.position, property z
         var a_parts = s_dotnotation.split(".");
@@ -46,7 +46,7 @@ class O_json_to_html {
         return o_return
     }
 
-    f_recursive_convert_object_to_html_element(object,  o_data_parent = null, s_prop_name_on_o_data_parent = null){
+    f_o_recursive_convert_object_to_html_element(object,  o_data_parent = null, s_prop_name_on_o_data_parent = null){
         
         var s_tag_name = object[this.s_prop_name_tag_name]
         s_tag_name = (s_tag_name) ? s_tag_name : this.s_default_tag_name
@@ -75,7 +75,7 @@ class O_json_to_html {
                 // s_prop_name_o_data_for_linking could be a property in dotnotation 
                 // which points to a nested object, for example 'color.rgba.r'
                 // so we have to get the parent object 'color.rgba' and the propname 'r'
-                var o_resolved_dotnotation = this.f_get_object_and_property_by_dot_notation(
+                var o_resolved_dotnotation = this.f_o_get_object_and_property_by_dot_notation(
                     o_data_parent, 
                     s_prop_name_on_o_data_parent + "." + s_prop_name_o_data_for_linking
                 );
@@ -101,6 +101,8 @@ class O_json_to_html {
                             o_data_resolved[s_prop_o_data_resolved], 
                             s_prop,
                         )
+                        //set the initial value
+                        o_html_element[s_prop_name_o_html_element][s_prop] = o_data_resolved[s_prop_o_data_resolved][s_prop]
                     }
                     // debugger
                     o_data_resolved[s_prop_o_data_resolved] = o_data_resolved[s_prop_o_data_resolved].o_proxy
@@ -119,7 +121,9 @@ class O_json_to_html {
                     // o_data_resolved = a_objs[0] // a_objs[0] is a proxy!
                     // o_data_resolved_parent[s_prop_o_data_resolved_parent] = a_objs[0]
                     o_data_resolved_parent[s_prop_o_data_resolved_parent] = o_data_resolved_parent[s_prop_o_data_resolved_parent].o_proxy
-                
+                    // set the initial value
+                    o_html_element[s_prop_name_o_html_element] = o_data_resolved[s_prop_o_data_resolved]// set the initial value
+                    
                 }
 
                 // inputs on input elements wont trigger setter function 
@@ -183,7 +187,7 @@ class O_json_to_html {
                     // ){
 
                     //     debugger
-                    //     o_html_element[s_prop_name] = this.f_recursive_convert_object_to_html_element(value, o_data_parent, s_prop_name_on_o_data_parent)
+                    //     o_html_element[s_prop_name] = this.f_o_recursive_convert_object_to_html_element(value, o_data_parent, s_prop_name_on_o_data_parent)
                     // }
                     // console.log(s_prop_name)
                     // console.log(value)
@@ -206,7 +210,7 @@ class O_json_to_html {
                     Array.isArray(o_child) == false &&
                     typeof o_child === "object"
                     ){
-                    var o_child_html_element = this.f_recursive_convert_object_to_html_element(o_child, o_data_parent, s_prop_name_on_o_data_parent)
+                    var o_child_html_element = this.f_o_recursive_convert_object_to_html_element(o_child, o_data_parent, s_prop_name_on_o_data_parent)
                     o_html_element.appendChild(o_child_html_element)
                 }
             }
@@ -226,7 +230,7 @@ class O_json_to_html {
 
         return o_html_element
     }
-    f_recursive_convert_html_element_to_object(o_html_element){
+    f_o_recursive_convert_html_element_to_object(o_html_element){
                 
         var obj = {};
 
@@ -243,7 +247,7 @@ class O_json_to_html {
         for(var key = 0; key < child_elements.length; key++){
           var child_element = child_elements[key];
 
-          var o_child_object = this.f_recursive_convert_html_element_to_object(child_element)
+          var o_child_object = this.f_o_recursive_convert_html_element_to_object(child_element)
           a_o_child_object.push(o_child_object);
         }
 
@@ -258,42 +262,133 @@ class O_json_to_html {
         return obj;
     }
 
-    f_json_or_jsobject_to_html(value, o_data_parent = null, s_prop_name_on_o_data_parent = null){
+    f_o_json_or_jsobject_to_html(value, o_data_parent = null, s_prop_name_on_o_data_parent = null){
 
 
-        var obj = this.f_recursive_convert_object_to_html_element(
-            this.f_convert_string_to_javascript_object(value),
+        var obj = this.f_o_recursive_convert_object_to_html_element(
+            this.f_o_convert_string_to_javascript_object(value),
             o_data_parent, 
             s_prop_name_on_o_data_parent
         )
 
-        
         return obj
         
     }
-    f_json_to_html(value,  o_data_parent = null, s_prop_name_on_o_data_parent = null){
-        return this.f_json_or_jsobject_to_html(value, o_data_parent,s_prop_name_on_o_data_parent)
+
+    f_o_json_to_html(value,  o_data_parent = null, s_prop_name_on_o_data_parent = null){
+        return this.f_o_json_or_jsobject_to_html(value, o_data_parent,s_prop_name_on_o_data_parent)
     }
-    f_javascript_object_to_html(value,  o_data_parent = null, s_prop_name_on_o_data_parent = null){ 
-        return this.f_json_or_jsobject_to_html(value, o_data_parent,s_prop_name_on_o_data_parent)
+    f_o_javascript_object_to_html(value,  o_data_parent = null, s_prop_name_on_o_data_parent = null){ 
+        return this.f_o_json_or_jsobject_to_html(value, o_data_parent,s_prop_name_on_o_data_parent)
     }
-    f_convert_string_to_javascript_object(value){
+    f_o_convert_string_to_javascript_object(value){
         // if not yet an object, convert to one
         if(typeof value === "string"){
             value = JSON.parse(value)
         }
         return value
     }
-    f_html_to_object(o_html_element){
+    f_o_html_to_object(o_html_element){
         return this.f_recursive_convert_html_element_to_object(o_html_element)
     }
-    f_html_to_json(o_html_element){
-        return JSON.stringify(this.f_html_to_object(o_html_element))
+    f_s_html_to_json(value){
+        return JSON.stringify(this.f_o_html_to_object(
+            this.f_s_o_html_element_or_string_to_o_html_element(value)
+        ))
+    }
+    f_s_o_html_element_or_string_to_o_html_element(value){
+        var o_html_element; 
+        if(typeof value === "string"){
+            o_html_element = document.createElement("div")
+            o_html_element.innerHTML = value 
+            if(o_html_element.childNodes.length == 1){
+                o_html_element = o_html_element.childNodes[0]
+            }
+            
+        }else{
+            o_html_element = value
+        }
+        return o_html_element
     }
     //aliases 
     parse(){
-        return this.f_json_to_html()
+        return this.f_o_json_to_html()
     }
+
+    f_handle_deprecated_function_name(s_fname_old,s_fname_new, ...args){
+        this.f_console_warn_deprecated_function_name(
+            s_fname_old, 
+            s_fname_new
+        )
+        return this[s_fname_new](...args)
+    }
+    f_console_warn_deprecated_function_name(s_fname_old,s_fname_new){
+        console.warn(
+            `the functionname ${s_fname_old} is deprecated , please use : ${s_fname_new}`
+            )
+    }
+    // aliases for deprecated function names
+    f_javascript_object_to_html(...args){
+        var s_fname_old = 'f_javascript_object_to_html'
+        var s_fname_new = 'f_o_javascript_object_to_html'
+        return this.f_handle_deprecated_function_name(
+            s_fname_old,
+            s_fname_new, 
+            ...args
+        )
+    }
+    f_json_or_jsobject_to_html(...args){
+        var s_fname_old = 'f_json_or_jsobject_to_html'
+        var s_fname_new = 'f_o_json_or_jsobject_to_html'
+        return this.f_handle_deprecated_function_name(
+            s_fname_old,
+            s_fname_new, 
+            ...args
+        )
+    }
+    f_json_to_html(...args){
+        var s_fname_old = 'f_json_to_html'
+        var s_fname_new = 'f_o_json_to_html'
+        return this.f_handle_deprecated_function_name(
+            s_fname_old,
+            s_fname_new, 
+            ...args
+        )
+    }
+
+    f_convert_string_to_javascript_object(...args){
+        var s_fname_old = 'f_convert_string_to_javascript_object'
+        var s_fname_new = 'f_o_convert_string_to_javascript_object'
+        return this.f_handle_deprecated_function_name(
+            s_fname_old,
+            s_fname_new, 
+            ...args
+        )
+    }
+
+    
+    f_html_to_object(...args){
+        var s_fname_old = 'f_html_to_object'
+        var s_fname_new = 'f_o_html_to_object'
+        return this.f_handle_deprecated_function_name(
+            s_fname_old,
+            s_fname_new, 
+            ...args
+        )
+    }
+    f_html_to_json(...args){
+        var s_fname_old = 'f_html_to_json'
+        var s_fname_new = 'f_s_html_to_json'
+        return this.f_handle_deprecated_function_name(
+            s_fname_old,
+            s_fname_new, 
+            ...args
+        )
+    }
+
+
+
+
 }
 
 export default O_json_to_html

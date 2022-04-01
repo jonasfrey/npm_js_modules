@@ -1,7 +1,7 @@
 {
   "name": "f_a_link_object_properties",
   "version": "1.0.4",
-  "description": "```javascript  import f_a_link_object_properties from \"./es6_modules/f_link_object_properties/f_link_object_properties.module.js\" ```",
+  "description": "links two properties of two separate objects, uses Proxy",
   "main": "f_a_link_object_properties.demo.module.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

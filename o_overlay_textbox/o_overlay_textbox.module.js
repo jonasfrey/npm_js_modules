@@ -13,8 +13,8 @@
 //     // console.log(marked)
 // })();
 
-// import marked from "marked"
-import "https://cdnjs.cloudflare.com/ajax/libs/marked/4.0.2/marked.min.js"
+import  "./node_modules/marked/marked.min.js"
+// import "https://cdnjs.cloudflare.com/ajax/libs/marked/4.0.2/marked.min.js"
 
 // development: 
 import O_json_to_html from "../o_json_to_html/o_json_to_html.module.js";
@@ -26,11 +26,15 @@ class O_overlay_textbox{
         this.o_data = {
             o_overlay:{
                 o_style: {
+
                     "left": '20px', 
                     "top": "20px",
-                    "display": "block"
+                    "display": "block", 
+                    // "margin":"20px",
+
                 },
-                s_inner_html: "asfd", 
+                n_margin_px: 20, 
+                s_inner_html: "initial test", 
             },
             o_html_element_target: null,
             s_box_shadow_cached: null,
@@ -39,8 +43,6 @@ class O_overlay_textbox{
         this.s_class_name = this.constructor.name.toLowerCase() 
         this.s_attribute_name = "s_"+this.constructor.name.toLowerCase() 
         this.s_class_name_hovered_element = this.s_attribute_name+"_hovered_element"; 
-        this.n_px_max_width = 350;
-        this.n_px_margin = 20
         this.o_cached_s_text_html_content = null
 
 
@@ -77,21 +79,39 @@ class O_overlay_textbox{
 
                 if(s_text){
                     self.o_data.o_overlay.o_style.display = "block"; 
-                    self.o_data.o_overlay.o_style.left = event.clientX+"px"
-                    self.o_data.o_overlay.o_style.top = event.clientY+"px"
-                    // console.log(self.o_data.o_overlay.o_style)
+
                 }
-                
+                    
                 
                 // if at bottom or at right side of page
                 var o_html_element_bounding_rect = self.o_html_element.getBoundingClientRect()
-    
-                if(event.clientY + o_html_element_bounding_rect.height + self.n_px_margin > window.innerHeight){
-                    self.o_data.o_overlay.o_style.top = (event.clientY-(o_html_element_bounding_rect.height))+"px"
-                }
-                if(event.clientX + o_html_element_bounding_rect.width + self.n_px_margin > window.innerWidth){
-                    self.o_data.o_overlay.o_style.left = (event.clientX-(o_html_element_bounding_rect.width + self.n_px_margin*2))+"px"
-                }
+                var o_html_element_bounding_rect_with_margin = JSON.parse(JSON.stringify(o_html_element_bounding_rect))
+                o_html_element_bounding_rect_with_margin.width = o_html_element_bounding_rect_with_margin.width + self.o_data.o_overlay.n_margin_px
+                o_html_element_bounding_rect_with_margin.height = o_html_element_bounding_rect_with_margin.height + self.o_data.o_overlay.n_margin_px
+                o_html_element_bounding_rect_with_margin.left = o_html_element_bounding_rect_with_margin.left - (self.o_data.o_overlay.n_margin_px/2)
+                o_html_element_bounding_rect_with_margin.top = o_html_element_bounding_rect_with_margin.top - (self.o_data.o_overlay.n_margin_px/2)
+
+                var n_delta_bottom_y = window.innerHeight - (event.clientY + o_html_element_bounding_rect_with_margin.height) 
+                var n_delta_top_y = 0 - (o_html_element_bounding_rect_with_margin.height - event.clientY)
+                // if(Math.abs(n_delta_bottom_y) >  Math.abs(n_delta_top_y)){
+                //     var n_top = (event.clientY-(o_html_element_bounding_rect_with_margin.height))
+                // }else{
+                //     var n_top = event.clientY + self.o_data.o_overlay.n_margin_px 
+                // }
+
+                // var n_delta_right_x = window.innerWidth - (event.clientX + o_html_element_bounding_rect_with_margin.width)
+                // var n_delta_left_x = 0 - (o_html_element_bounding_rect_with_margin.width - event.clientX)
+                // if(Math.abs(n_delta_right_x) >  Math.abs(n_delta_left_x)){
+                //     var n_left = event.clientX + self.o_data.o_overlay.n_margin_px  
+                // }else{
+                //     var n_left = (event.clientX-(o_html_element_bounding_rect_with_margin.width))
+                // }
+            
+                var n_top = event.clientY + self.o_data.o_overlay.n_margin_px 
+                var n_left = event.clientX + self.o_data.o_overlay.n_margin_px  
+
+                self.o_data.o_overlay.o_style.top = n_top+"px"
+                self.o_data.o_overlay.o_style.left = n_left+"px"
 
             }
 
@@ -103,7 +123,7 @@ class O_overlay_textbox{
     }
 
     f_o_html_element(){
-        return this.o_json_to_html.f_javascript_object_to_html(
+        return this.o_json_to_html.f_o_javascript_object_to_html(
             {
                 s_t: "div", 
                 a_c: [
@@ -120,11 +140,12 @@ class O_overlay_textbox{
                                 z-index:1; 
                                 background:rgba(3,3,3,0.8);
                                 color:rgba(243, 243,243, 0.9);
-                                margin:${this.n_px_margin}px;
                                 padding: 0.9rem;
-                                max-width: ${this.n_px_max_width}px;
                                 font-family: arial; 
                                 box-shadow: rgb(0 0 0 / 30%) 0px 2px 5px 6px;
+                                max-width: 400px;
+                                width: auto;
+                                min-width: 180px;
                             }
                             .${this.s_class_name} p{
                                 margin: auto;

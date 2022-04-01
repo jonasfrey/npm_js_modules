@@ -118,8 +118,6 @@ var object = o_json_to_html.f_javascript_object_to_html(document.querySelector("
 ## pass data object to function 
 documentation coming soon 
 
-```
-
 # version log
 
 ## 1.0.4
@@ -139,3 +137,16 @@ readme improvements
 
 ## 1.0.7 
 - changed documentaiton errors
+
+## 1.0.8 
+- renamed most of the functions, the old names are still available and should not cause any problems but throw a `console.warn`
+|s_fname_old|s_fname_new|
+|---|---|
+|`f_javascript_object_to_html`|`f_o_javascript_object_to_html`|
+|`f_json_or_jsobject_to_html`|`f_o_json_or_jsobject_to_html`|
+|`f_json_to_html`|`f_o_json_to_html`|
+|`f_convert_string_to_javascript_object`|`f_o_convert_string_to_javascript_object`|
+|`f_html_to_object`|`f_o_html_to_object`|
+|`f_html_to_json`|`f_s_html_to_json`|
+
+- added the initial assignment of the linked properties, so that the linked properties on the o_html_element instance has an inital value

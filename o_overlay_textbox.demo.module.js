@@ -1,14 +1,44 @@
 import O_overlay_textbox from "./o_overlay_textbox/o_overlay_textbox.module.js"
 import O_json_to_html from "./o_json_to_html/o_json_to_html.module.js"
 var o_json_to_html = new O_json_to_html()
-var o_overlay_textbox = new O_overlay_textbox()
-var el = (o_json_to_html.f_javascript_object_to_html(
+window.o_overlay_textbox = new O_overlay_textbox()
+var el = (o_json_to_html.f_o_javascript_object_to_html(
     {
         a_c: [
+            {
+                "div": "div",
+                "a_c": [
+                    {
+                        "div": "h1",
+                        "s_o_overlay_textbox": "line -> \n\n-> break!",
+                        "s_inner_text": "Line break demo: double line break"
+                    },
+                    {
+                        "div": "h1",
+                        "s_o_overlay_textbox": "line -> <br>-> break!",
+                        "s_inner_text": "Line break demo: markdown <br> tag"
+                    },
+                    {
+                        "div": "h1",
+                        "s_o_overlay_textbox": "|formula|TAU|PI|\n|:---|:---|:---|\n|eulers equation|eiτ   =1+0|eiπ=−1|\n|circle area|r*r*(τ/2)|r*r*π|",
+                        "s_inner_text": "TAU vs PI"
+                    },
+                    {
+                        "div": "h1",
+                        "s_o_overlay_textbox": "| Syntax      | Description | Test Text     |\n| :---        |    :----:   |          ---: |\n| Header      | Title       | Here's this   |\n| Paragraph   | Text        | And more      |\n",
+                        "s_inner_text": "\nmarkdonw table"
+                    }
+                ]
+            },
             {
                 s_t: "h1", 
                 "s_inner_text": "hover some elements!", 
                 "s_o_overlay_textbox": "this is a simple heading"
+            }, 
+            {
+                s_t: "h1", 
+                "s_inner_text": "hover some elements!", 
+                "s_o_overlay_textbox": "<iframe width='1000' height='1000' src='http://localhost:3000/demos.html'></iframe>"
             }, 
             {
                 s_t: "img", 
@@ -39,7 +69,7 @@ Bears are carnivoran mammals of the family Ursidae. They are classified as canif
             {
                 s_t: "img", 
                 "src": "https://images.unsplash.com/photo-1535591273668-578e31182c4f?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&ixid=eyJhcHBfaWQiOjM2NTI5fQ", 
-                "s_o_overlay_textbox": "Clownfish or anemonefish are fishes from the subfamily Amphiprioninae in the family Pomacentridae. Thirty species are recognized: one in the genus Premnas, while the remaining are in the genus Amphiprion. In the wild, they all form symbiotic mutualisms with sea anemones. Wikipedia"
+                "s_o_overlay_textbox": "# Clownfish \nClownfish or anemonefish are fishes from the subfamily Amphiprioninae in the family Pomacentridae. Thirty species are recognized: one in the genus Premnas, while the remaining are in the genus Amphiprion. In the wild, they all form symbiotic mutualisms with sea anemones. Wikipedia"
             }, 
             {
                 s_t: "h1", 
@@ -55,6 +85,25 @@ Bears are carnivoran mammals of the family Ursidae. They are classified as canif
                     }
                     img{
                         max-width: 300px
+                    }
+                    /* unvisited link */
+                    a:link {
+                      color: red;
+                    }
+                    
+                    /* visited link */
+                    a:visited {
+                      color: green;
+                    }
+                    
+                    /* mouse over link */
+                    a:hover {
+                      color: hotpink;
+                    }
+                    
+                    /* selected link */
+                    a:active {
+                      color: blue;
                     }
                 `
                 // .split("\n").join("")
