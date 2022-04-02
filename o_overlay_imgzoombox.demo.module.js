@@ -1,63 +1,86 @@
 import O_overlay_imgzoombox from "./o_overlay_imgzoombox/o_overlay_imgzoombox.module.js"
-import o_json_to_html from "./o_json_to_html/o_json_to_html.module.js"
-var o_html = o_json_to_html.f_javascript_object_to_html(
+import O_json_to_html from "./o_json_to_html/o_json_to_html.module.js"
+
+var o_json_to_html = new O_json_to_html()
+var o_html = o_json_to_html.f_o_javascript_object_to_html(
     {
-        c: [
+        a_c: [
             {
-                t: "h1", 
+                s_t: "h1", 
                 "s_inner_text": "hover some elements!", 
                 "s_o_overlay_textbox": "this is a simple heading"
             }, 
             {
-                t: "img", 
+                s_t: "img", 
                 "src": "http://ichef.bbci.co.uk/news/976/cpsprodpb/02C2/production/_122360700_gettyimages-1280424615.jpg", 
             }, 
             {
-                t: "div", 
+                s_t: "div", 
                 "class": "div_img",
                 "style": "background-image:url(http://cdn.britannica.com/29/150929-050-547070A1/lion-Kenya-Masai-Mara-National-Reserve.jpg)", 
             }, 
             {
-                t: "div", 
+                s_t: "div", 
                 "class": "div_img",
                 "style": "background-image:url(http://www.teahub.io/photos/full/217-2178703_super-ultrawide.jpg)", 
             }, 
             {
-                t: "div", 
+                s_t: "div", 
                 "class": "div_img",
                 "style": "background-image:url(http://images.unsplash.com/photo-1589633827726-8bb96fb3507b?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8aGlnaCUyMHF1YWxpdHl8ZW58MHx8MHx8&w=1000&q=80)", 
             }, 
             
             {
-                t: "div", 
+                s_t: "div", 
                 "class": "div_img image_with_background_image_in_css"
             }, 
             {
-                t: "div", 
+                s_t: "div", 
                 "class": "div_img image_with_background_image_in_css cover"
             }, 
             {
-                t: "div", 
-                "class": "div_img",
-                "style": "background: #ffffff url('http://i.ibb.co/7RhFZmZ/tag.jpg') no-repeat right top", 
+                s_t: "div", 
+                "class": "div_img cover",
+                "style": "background-image:url('http://i.ibb.co/7RhFZmZ/tag.jpg')", 
             }, 
             {
-                t: "div", 
-                "class": "div_img",
-                "style": "background: #ffffff url('http://i.pinimg.com/originals/50/e3/f3/50e3f37c526db244557b4f2c3b0141e7.jpg') no-repeat", 
+                s_t: "div", 
+                "class": "cover",
+                "style": "background-image:url('http://i.ibb.co/7RhFZmZ/tag.jpg'); width:100% !important; height:30vw !important;", 
             }, 
             {
-                t: "div", 
+                s_t: "div", 
+                "class": "cover",
+                "style": "background-image:url('http://i.pinimg.com/originals/50/e3/f3/50e3f37c526db244557b4f2c3b0141e7.jpg'); width:100% !important; height:30vw !important;", 
+            }, 
+
+            {
+                s_t: "div", 
+                "class": "cover",
+                "style": "background-image:url('http://i.pinimg.com/originals/50/e3/f3/50e3f37c526db244557b4f2c3b0141e7.jpg'); width:50% !important; height:100vh !important;", 
+            }, 
+            {
+                s_t: "div", 
+                "class": "contain",
+                "style": "background-image:url('http://i.ibb.co/7RhFZmZ/tag.jpg'); width:100% !important; height:10vw !important;", 
+            }, 
+            {
+                s_t: "div", 
+                "class": "contain",
+                "style": "background-image:url('http://i.ibb.co/7RhFZmZ/tag.jpg'); width:30% !important; height:100vh !important;", 
+            }, 
+            {
+                s_t: "div", 
                 "class": "div_img",
                 "style": "background: #ffffff url() no-repeat right top", 
             },
             {
-                t: "div", 
+                s_t: "div", 
                 "class": "div_img",
                 "style": "background: #ffaaff no-repeat right top", 
             },  
             {
-                "t": "style", 
+                "s_t": "style", 
                 "s_inner_html": `
                     .div_img{
                         max-width: 100%;
@@ -72,6 +95,9 @@ var o_html = o_json_to_html.f_javascript_object_to_html(
                     }
                     .cover{
                         background-size: cover;
+                    }
+                    .contain{
+                        background-size: contain;
                     }
                 `
             }

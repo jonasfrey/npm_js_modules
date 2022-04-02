@@ -57,15 +57,19 @@ class O_overlay_imgzoombox{
                 }, 
             },
             o_overlay_box: {
+                n_left: 0, 
+                n_top: 0, 
                 o_style: {
                     "left": 0,
                     "top": 0,
                 },
             },
             o_img_preview: {
-                n_scale_factor : 1, // 500% 
+                n_scale_factor : 10, // 500% 
                 o_style: {
-                    s_style_inline: "background-image:url(...)"
+                    backgroundImage:'url();',
+                    backgroundSize:'100%;',
+                    backgroundPosition:'calc();',
                 },
                 n_zoom_factor:1,
             },
@@ -159,30 +163,36 @@ class O_overlay_imgzoombox{
                 e.preventDefault();
                 e.stopImmediatePropagation()
                 // console.log(e.deltaY)
-                self.o_data.o_img_preview.o_style.n_scale_factor = 
-                    self.o_data.o_img_preview.o_style.n_scale_factor + (e.deltaY * self.o_data.o_img_preview.o_style.n_scale_factor*0.001 * -1)
-                self.o_data.o_img_preview.o_style.n_scale_factor = 
-                    Math.max(0.005, self.o_data.o_img_preview.o_style.n_scale_factor)
-                self.o_data.o_img_preview.o_style.n_scale_factor = 
-                    Math.min(100, self.o_data.o_img_preview.o_style.n_scale_factor)
+                self.o_data.o_img_preview.n_scale_factor = 
+                    self.o_data.o_img_preview.n_scale_factor + (e.deltaY * self.o_data.o_img_preview.n_scale_factor*0.001 * -1)
+                self.o_data.o_img_preview.n_scale_factor = 
+                    Math.max(0.005, self.o_data.o_img_preview.n_scale_factor)
+                self.o_data.o_img_preview.n_scale_factor = 
+                    Math.min(100, self.o_data.o_img_preview.n_scale_factor)
                 self.f_calculate_style()    
             }
         }
         this.f_add_event_listeners()
 
         self.f_calculate_style()
-        self.o_data.o_overlay_box.o_style.s_style_inline = `left:${self.o_data.o_overlay_box.o_style.n_left}px;top:${self.o_data.o_overlay_box.o_style.n_top}px;`
+        self.o_data.o_overlay_box.o_style.left = `${self.o_data.o_overlay_box.n_left}px`
+        self.o_data.o_overlay_box.o_style.top = `${self.o_data.o_overlay_box.n_top}px;`
 
     }
     f_handle_drag(){
         var self = this
         var mouse_delta_x = self.o_data.o_mouse.o_position_relative_to_window.n_x - self.o_data.o_mouse.o_position_relative_to_window_last.n_x
         var mouse_delta_y = self.o_data.o_mouse.o_position_relative_to_window.n_y - self.o_data.o_mouse.o_position_relative_to_window_last.n_y
-        
         if(self.o_data.b_drag_locked){
-            self.o_data.o_overlay_box.o_style.n_left += mouse_delta_x
-            self.o_data.o_overlay_box.o_style.n_top += mouse_delta_y            
-            self.o_data.o_overlay_box.o_style.s_style_inline = `left:${self.o_data.o_overlay_box.o_style.n_left}px;top:${self.o_data.o_overlay_box.o_style.n_top}px;`
+            self.o_data.o_overlay_box.o_style.boxShadow = "0 4px 10px 2px rgb(64 60 67 / 16%)";
+            self.o_data.o_overlay_box.n_left += mouse_delta_x
+            self.o_data.o_overlay_box.n_top += mouse_delta_y         
+            
+            self.o_data.o_overlay_box.o_style.left = `${self.o_data.o_overlay_box.n_left}px`
+            self.o_data.o_overlay_box.o_style.top = `${self.o_data.o_overlay_box.n_top}px`
+        }else{
+            self.o_data.o_overlay_box.o_style.boxShadow = "none";
+
         }
     }
     f_on_mousedown(event){
@@ -207,28 +217,34 @@ class O_overlay_imgzoombox{
         var self = this
         self.f_get_image_data(event, true, function(){
             console.warn(`cannot get pixel information for image with url ${self.o_data.o_image.s_url},because No 'Access-Control-Allow-Origin' header is present on the server hosting the image`)
-            self.f_get_image_data(event, false)
+            self.f_get_image_data(event, false, function(){
+                console.log("error")
+            })
         }) 
     }
     
     f_get_image_data(event, b_cross_origin_anonymous = true, f_on_error){
         var self = this
         var o_img = document.createElement("img");
-        if(b_cross_origin_anonymous){
-            o_img.crossOrigin = 'anonymous';
-        }
+        // if(b_cross_origin_anonymous){
+        //     o_img.crossOrigin = 'anonymous';
+        //      // somehow if crossOrigin is set, o_img.width and o_img.height is undefined
+        // }
         o_img.onload = function(){
-            console.log("onload")
+            
             self.o_data.o_image.n_width = this.width; 
             self.o_data.o_image.n_height = this.height; 
+            self.o_data.o_image.n_ratio_n_width_to_n_height = this.width/ this.height; 
+            self.o_data.o_image.n_ratio_n_height_to_n_width = this.height / this.width; 
             
-            console.log(self.o_data.o_image.n_width)
-            self.o_canvas.width = this.width;
-            self.o_canvas.height = this.height;
-
-            self.o_canvas_context.drawImage(o_img, 0, 0, this.width, this.height);
-            var a_pixel_data = self.o_canvas_context.getImageData(0, 0, this.width, this.height).data;
-            self.o_data.o_image.a_image_data = a_pixel_data
+            //todo: tainted image bug
+            // console.log(self.o_data.o_image.n_width)
+            // self.o_canvas.width = this.width;
+            // self.o_canvas.height = this.height;
+            
+            // self.o_canvas_context.drawImage(o_img, 0, 0, this.width, this.height);
+            // var a_pixel_data = self.o_canvas_context.getImageData(0, 0, this.width, this.height).data;
+            // self.o_data.o_image.a_image_data = a_pixel_data
 
 
         }
@@ -242,6 +258,12 @@ class O_overlay_imgzoombox{
     }
     f_calculate_mouse_position_relative_to_image(event){
         var self = this
+        var o_image_parent_bounding_rect = self.o_target.getBoundingClientRect()
+
+        var o_image_parent_n_ratio_n_width_to_n_height = o_image_parent_bounding_rect.width /o_image_parent_bounding_rect.height
+        var o_image_parent_n_ratio_n_height_to_n_width = o_image_parent_bounding_rect.height /o_image_parent_bounding_rect.width
+        var o_image_parent_n_ratio_n_height_to_img_n_height = o_image_parent_bounding_rect.height /self.o_data.o_image.n_height
+        var o_image_parent_n_ratio_n_width_to_img_n_width = o_image_parent_bounding_rect.width /self.o_data.o_image.n_width
         //calculating image position
         var o_computed_style = window.getComputedStyle(self.o_target); 
         var s_background_size = o_computed_style.getPropertyValue("background-size")
@@ -254,23 +276,75 @@ class O_overlay_imgzoombox{
         self.o_data.o_mouse.o_position_relative_to_img.n_y_normalized = self.o_data.o_mouse.o_position_relative_to_img.n_y / self.o_data.o_mouse.o_image_bounding_rect.height 
         
        
-        //if the image is a background image set to 'contain' we cannot just normalize x and y 
-        var n_ratio_width_to_height = self.o_data.o_image.n_width / self.o_data.o_image.n_height; 
+
 
         self.o_data.o_image.n_factor_normalizing_x = 1
         self.o_data.o_image.n_factor_normalizing_y = 1
 
         if(
             s_background_size.toLowerCase() == "contain"
+        ){  
+            // console.log("contain")
+            if(o_image_parent_n_ratio_n_width_to_n_height > self.o_data.o_image.n_ratio_n_width_to_n_height){
+                self.o_data.o_image.n_factor_normalizing_x = o_image_parent_n_ratio_n_width_to_n_height / self.o_data.o_image.n_ratio_n_width_to_n_height
+            }else{
+                self.o_data.o_image.n_factor_normalizing_y = o_image_parent_n_ratio_n_height_to_n_width / self.o_data.o_image.n_ratio_n_height_to_n_width
+
+            }
+            // if(self.o_data.o_image.n_ratio_n_width_to_n_height > 1){
+            //     self.o_data.o_image.n_factor_normalizing_y = self.o_data.o_image.n_ratio_n_width_to_n_height
+            // }
+            // if(self.o_data.o_image.n_ratio_n_width_to_n_height < 1){
+            //     self.o_data.o_image.n_factor_normalizing_x = 1 / self.o_data.o_image.n_ratio_n_width_to_n_height
+            // }
+            
+        }
+
+        if(
+            s_background_size.toLowerCase() == "cover"
         ){
-            
-            if(self.o_data.o_image.n_ratio_width_to_height < 1){
-                self.o_data.o_image.n_factor_normalizing_x = 1 / self.o_data.o_image.n_ratio_width_to_height
+            // the smaller ratio of the image has to fit into the bigger ratio of the parent to cover all the parent with image data 
+            var n_ratio_img_smaller = Math.min(
+                self.o_data.o_image.n_ratio_n_width_to_n_height, 
+                self.o_data.o_image.n_ratio_n_height_to_n_width
+            )
+            var n_ratio_img_bigger = Math.max(
+                self.o_data.o_image.n_ratio_n_width_to_n_height, 
+                self.o_data.o_image.n_ratio_n_height_to_n_width
+            )
+            var n_ratio_parent_smaller = Math.min(
+                o_image_parent_n_ratio_n_width_to_n_height, 
+                o_image_parent_n_ratio_n_height_to_n_width
+            )
+            var n_ratio_parent_bigger = Math.max(
+                o_image_parent_n_ratio_n_width_to_n_height, 
+                o_image_parent_n_ratio_n_height_to_n_width
+            )
+            var n_ratio_img_smaller_to_parent_bigger = n_ratio_img_smaller / n_ratio_parent_bigger
+            var n_ratio_img_bigger_to_parent_smaller = n_ratio_parent_bigger / n_ratio_img_smaller
+
+            // self.o_data.o_image.n_factor_normalizing_x = 1/ n_ratio_img_smaller_to_parent_bigger
+            if(
+                ( o_image_parent_n_ratio_n_width_to_n_height >= 1 )
+            ){
+             self.o_data.o_image.n_factor_normalizing_x = 1
+             self.o_data.o_image.n_factor_normalizing_y = self.o_data.o_image.n_ratio_n_width_to_n_height / o_image_parent_n_ratio_n_width_to_n_height
+            }else{
+                self.o_data.o_image.n_factor_normalizing_y = 1
+                self.o_data.o_image.n_factor_normalizing_x = self.o_data.o_image.n_ratio_n_height_to_n_width / o_image_parent_n_ratio_n_height_to_n_width
+         
             }
-            if(self.o_data.o_image.n_ratio_width_to_height > 1){
-                self.o_data.o_image.n_factor_normalizing_y = self.o_data.o_image.n_ratio_width_to_height
-            }
-            
+
+
+            // // if(o_image_parent_n_ratio_n_width_to_n_height < self.o_data.o_image.n_ratio_n_width_to_n_height){
+            //     // self.o_data.o_image.n_factor_normalizing_x = o_image_parent_n_ratio_n_width_to_n_height / self.o_data.o_image.n_ratio_n_width_to_n_height
+            // // }
+            // // if(o_image_parent_n_ratio_n_width_to_n_height > self.o_data.o_image.n_ratio_n_width_to_n_height){
+            //     // self.o_data.o_image.n_factor_normalizing_x = 1 / (o_image_parent_n_ratio_n_width_to_n_height / self.o_data.o_image.n_ratio_n_width_to_n_height)
+            // // }
+            // self.o_data.o_image.n_factor_normalizing_x = o_image_parent_n_ratio_n_width_to_n_height / self.o_data.o_image.n_ratio_n_width_to_n_height
+
+
         }
 
         self.o_data.o_mouse.o_position_relative_to_img.n_x_normalized = 
@@ -297,21 +371,19 @@ class O_overlay_imgzoombox{
         var n_border_offset_x_px = (o_image_parent_bounding_rect.width) * n_border_translation_x_factor
         var n_border_offset_y_px = (o_image_parent_bounding_rect.height) * n_border_translation_y_factor
         
-        // console.log(self.o_data.o_mouse.o_position_relative_to_img.n_x_normalized)
-        var s_style_inline =  ""
-        s_style_inline+=`background-image:url(${self.o_data.o_image.s_url});`
-        s_style_inline+=`background-size:${self.o_data.o_img_preview.o_style.n_scale_factor*100}%;`
-        s_style_inline+=`background-position:calc(${n_offset_x_perc}% + ${n_border_offset_x_px}px ) calc(${n_offset_y_perc}% + ${n_border_offset_y_px}px );`
+
+        self.o_data.o_img_preview.o_style.backgroundImage = `url(${self.o_data.o_image.s_url})`
+        self.o_data.o_img_preview.o_style.backgroundSize = `${self.o_data.o_img_preview.n_scale_factor*100}%`
+        self.o_data.o_img_preview.o_style.backgroundPosition = `calc(${n_offset_x_perc}% + ${n_border_offset_x_px}px ) calc(${n_offset_y_perc}% + ${n_border_offset_y_px}px )`
         
         // s_style_inline+=`transform:translate(${n_border_translation_x_factor*100}%,${n_border_translation_y_factor*100}%);`
         // s_style_inline+=`background-position-x:${n_offset_x_perc}%, left;`// origin top
         // s_style_inline+=`background-position-y:${n_offset_y_perc}%, top;`//origin left
-        self.o_data.o_img_preview.o_style.s_style_inline = s_style_inline
 
 
         // // var img_preview = document.querySelector(".img_preview");
         // // var o_image_bounding_rect_img_preview = img.getBoundingClientRect()
-        // s_style_inline2+=`width: ${self.o_data.o_img_preview.o_style.n_scale_factor*100}%;`
+        // s_style_inline2+=`width: ${self.o_data.o_img_preview.n_scale_factor*100}%;`
         // self.o_data.o_img_preview.o_style.s_style_inline2 = s_style_inline2
 
         // var img = document.querySelector(".img_element");
@@ -354,20 +426,20 @@ class O_overlay_imgzoombox{
         } 
     }
     f_o_html_element(){
-        return this.o_json_to_html.f_javascript_object_to_html(
+        return this.o_json_to_html.f_o_javascript_object_to_html(
             {
-                t: "div", 
-                c: [
+                s_t: "div", 
+                a_c: [
                     {
                         "class": this.s_class_name,
                         "style<>": "o_overlay_box.o_style",
-                        "c": [
+                        "a_c": [
                             {
                                 "class": "top bar", 
-                                "c": [
+                                "a_c": [
                                     {
                                         "class": "mouse position", 
-                                        "c": [
+                                        "a_c": [
                                             {
                                                 "innerText":"x: "
                                             },
@@ -384,10 +456,10 @@ class O_overlay_imgzoombox{
                                     }, 
                                     {
                                         "class": "mouse pixel", 
-                                        "c": [
+                                        "a_c": [
                                             {
                                                 "class": "r", 
-                                                "c" : [
+                                                "a_c" : [
                                                     {
                                                         "s_inner_text": "r:"
                                                     }, 
@@ -398,7 +470,7 @@ class O_overlay_imgzoombox{
                                             },
                                             {
                                                 "class": "g", 
-                                                "c" : [
+                                                "a_c" : [
                                                     {
                                                         "s_inner_text": "g:"
                                                     }, 
@@ -409,7 +481,7 @@ class O_overlay_imgzoombox{
                                             },
                                             {
                                                 "class": "b", 
-                                                "c" : [
+                                                "a_c" : [
                                                     {
                                                         "s_inner_text": "b:"
                                                     }, 
@@ -420,7 +492,7 @@ class O_overlay_imgzoombox{
                                             },
                                             {
                                                 "class": "a", 
-                                                "c" : [
+                                                "a_c" : [
                                                     {
                                                         "s_inner_text": "a:"
                                                     }, 
@@ -438,7 +510,7 @@ class O_overlay_imgzoombox{
                                     },
                                     {
                                         "class": "open_in_new_tab",
-                                        "c" :[
+                                        "a_c" :[
                                             {
                                                 "t": "i",
                                                 "class": "fa-solid fa-image",
@@ -460,25 +532,20 @@ class O_overlay_imgzoombox{
                             }, 
                             {
                                 "class": "img_preview", 
-                                "c": [
+                                "a_c": [
                                     {
                                         "class": "backgroundimage",
-                                        "style<>": "o_img_preview.o_style.s_style_inline",
+                                        "style<>": "o_img_preview.o_style",
                                     },
-                                    // {
-                                    //     "class": "img_element", 
-                                    //     "t": "img", 
-                                    //     "src<>": "o_image.s_url", 
-                                    //     "style<>": "o_img_preview.o_style.s_style_inline2",
-                                    // },
+
                                 ]
                             },
                             {
                                 "class": "bottom bar",
-                                "c": [
+                                "a_c": [
                                     {
                                         "class": "zoom factor",
-                                        "c": [
+                                        "a_c": [
                                             {
                                                 "s_inner_text": "mousewheel to change zoom factor: "
                                             },
@@ -493,7 +560,7 @@ class O_overlay_imgzoombox{
 
                     }, 
                     {
-                        "t": "style", 
+                        "s_t": "style", 
                         "s_inner_html": `
                             .${this.s_class_name}{
                                 position:fixed; 
@@ -529,7 +596,7 @@ class O_overlay_imgzoombox{
                                 top:0; 
                                 left:0;
                                 background-size: contain;
-                                background-repeat: no-repeat;                            
+                        
                                 image-rendering: pixelated;
                             }
                             .img_element {
@@ -544,7 +611,9 @@ class O_overlay_imgzoombox{
                     }
                 ]
             }
-          ,this.o_data
+          ,
+          this,
+          "o_data" 
         )
     }
 
