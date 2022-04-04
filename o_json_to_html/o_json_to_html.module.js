@@ -24,7 +24,15 @@ class O_json_to_html {
                 var o_object_parent = o_object
                 var s_prop_parent = a_parts[0]
             }
-            o_object = o_object[a_parts.shift()]
+            var s_prop = a_parts.shift()
+            var o_object_parent = o_object
+            o_object = o_object[s_prop]
+            if(!o_object.o_proxy){
+                f_add_property_o_proxy(o_object)
+            }
+
+            o_object_parent[s_prop] = o_object.o_proxy
+            // o_object = o
         }
 
         var o_return  ={
@@ -75,6 +83,8 @@ class O_json_to_html {
                 // s_prop_name_o_data_for_linking could be a property in dotnotation 
                 // which points to a nested object, for example 'color.rgba.r'
                 // so we have to get the parent object 'color.rgba' and the propname 'r'
+                // foreach nested object we have to add a proxy, because 
+                // if a nested object changes, the proxy would be lost!!!
                 var o_resolved_dotnotation = this.f_o_get_object_and_property_by_dot_notation(
                     o_data_parent, 
                     s_prop_name_on_o_data_parent + "." + s_prop_name_o_data_for_linking
@@ -199,7 +209,12 @@ class O_json_to_html {
 
         }
         // // we have to add a proxy
-        // f_add_property_o_proxy(o_data); 
+        // debugger
+        if(o_data_parent){
+            if(!o_data_parent[s_prop_name_on_o_data_parent].o_proxy)
+            f_add_property_o_proxy(o_data_parent[s_prop_name_on_o_data_parent]);
+            o_data_parent[s_prop_name_on_o_data_parent] = o_data_parent[s_prop_name_on_o_data_parent].o_proxy
+        }
 
         // handle childre
         var a_o_child_object = object[this.s_prop_name_children_elements]

@@ -9,9 +9,12 @@ import {O_value} from "./f_a_link_object_properties/f_a_link_object_properties.m
 var o_json_to_html = new O_json_to_html()
 
 document.addEventListener('DOMContentLoaded', () => {
+
 window.o_json_to_html_demo = {
 
 } 
+
+var f_simple_json_to_html_demo = function(){
 
 o_json_to_html_demo.s_json_example = `{
 
@@ -91,8 +94,11 @@ document.body.appendChild(o_json_to_html_demo.o_s_json_example)
 
 o_json_to_html_demo.o_o_object_example = o_json_to_html.f_json_to_html(o_json_to_html_demo.o_object_example)
 document.body.appendChild(o_json_to_html_demo.o_o_object_example)
+}
 
+var f_simple_html_to_json_demo = function(){
 
+    
 o_json_to_html_demo.s_html = `
 <h1>Didn't melt fairer keepsakes since Fellowship elsewhere.</h1>
 <p>Woodlands payment Osgiliath tightening. Barad-dur follow belly comforts tender tough bell? Many that live deserve death. Some that die deserve life. Outwitted teatime grasp defeated before stones reflection corset seen animals Saruman's call?</p>
@@ -348,102 +354,111 @@ o_json_to_html_demo.o_container.innerHTML = o_json_to_html_demo.s_html
 document.body.appendChild(o_json_to_html_demo.o_container)
 
 var o_object = o_json_to_html.f_html_to_json(o_json_to_html_demo.o_container)
+
+
 // console.log(o_object)
 window.o_object = o_object
 
 
-o_json_to_html_demo.o_data = {
-    style_for_img: {
-        s_style_inline: "border:10px solid red"
-    },
-    text_input: "hello test", 
-    text_style: {
-        color: "red"
-    },
-    style: {
-        color: "blue",
-        left:"10%"
-    },
-    text_innerhtml: "logogogogos", 
-    nested: {
-        "text": "asdf"
-    }, 
-    o_box: {
-        o_style: {
-            "a_s_font_family":["arial", "serif", "Helvetica"],  
-            
-            "background-color": "red", 
-            "padding": "20px", 
-            "border": "5px solid blue",
-            "font-size": "20px",
-            "font-family": "arial",
-            
-            o_getter_setter: {
-                f_setter: function(value_old, object, s_prop, value){
-                    // debugger 
-                    console.log(s_prop)
-                    console.log("f_setter called")
-                    if(["s_style_inline", "o_getter_setter"].indexOf(s_prop) == -1){
-                        var s_css = ""
-                        for(var s_key in this){
-                            // debugger
-                            if(["s_style_inline", "o_getter_setter", "a_s_font_family"].indexOf(s_key) == -1){
-                                s_css += `${s_key}:${this[s_key]};` 
+}
+
+
+var f_simple_json_to_html_demo_with_data  = function(){
+
+
+
+    o_json_to_html_demo.o_data = {
+        style_for_img: {
+            s_style_inline: "border:10px solid red"
+        },
+        text_input: "hello test", 
+        text_style: {
+            color: "red"
+        },
+        style: {
+            color: "blue",
+            left:"10%"
+        },
+        text_innerhtml: "logogogogos", 
+        nested: {
+            "text": "asdf"
+        }, 
+        o_box: {
+            o_style: {
+                "a_s_font_family":["arial", "serif", "Helvetica"],  
+                
+                "background-color": "red", 
+                "padding": "20px", 
+                "border": "5px solid blue",
+                "font-size": "20px",
+                "font-family": "arial",
+                
+                o_getter_setter: {
+                    f_setter: function(value_old, object, s_prop, value){
+                        // debugger 
+                        console.log(s_prop)
+                        console.log("f_setter called")
+                        if(["s_style_inline", "o_getter_setter"].indexOf(s_prop) == -1){
+                            var s_css = ""
+                            for(var s_key in this){
+                                // debugger
+                                if(["s_style_inline", "o_getter_setter", "a_s_font_family"].indexOf(s_key) == -1){
+                                    s_css += `${s_key}:${this[s_key]};` 
+                                }
                             }
+                            console.log(s_css)
+                            
+                            this.s_style_inline = s_css
                         }
-                        console.log(s_css)
-                        
-                        this.s_style_inline = s_css
+                    }
+                },
+                s_style_inline: "background-image:url(...)"
+            },
+        },
+        parse_int_test: {
+            n_num : 12, 
+            o_getter_setter: {
+                f_setter_n_num: function(value_old, object, s_prop, value){
+                    
+                    //this is an example on how to prevent infinit recursion
+                    var val  = parseInt(this.n_num)
+                    var o_value = new O_value(val)
+                    o_value.b_dont_call_f_setter = true
+                    // val.a_o_object.push(this)
+                    this.n_num = o_value 
+                    console.log(val)
+                }
+            }
+        },
+        infinit_recursion_test2: {
+            n_num : 12, 
+            b_setter_called : false, 
+            o_getter_setter: {
+                f_setter_n_num: function(value_old, object, s_prop, value){
+                    
+                    if(!this.b_setter_called){
+                        this.b_setter_called = true
+                        this.n_num = parseInt(this.n_num)
+                        this.b_setter_called = false
                     }
                 }
-            },
-            s_style_inline: "background-image:url(...)"
-        },
-    },
-    parse_int_test: {
-        n_num : 12, 
-        o_getter_setter: {
-            f_setter_n_num: function(value_old, object, s_prop, value){
-                
-                //this is an example on how to prevent infinit recursion
-                var val  = parseInt(this.n_num)
-                var o_value = new O_value(val)
-                o_value.b_dont_call_f_setter = true
-                // val.a_o_object.push(this)
-                this.n_num = o_value 
-                console.log(val)
             }
-        }
-    },
-    infinit_recursion_test2: {
-        n_num : 12, 
-        b_setter_called : false, 
-        o_getter_setter: {
-            f_setter_n_num: function(value_old, object, s_prop, value){
-                
-                if(!this.b_setter_called){
-                    this.b_setter_called = true
-                    this.n_num = parseInt(this.n_num)
-                    this.b_setter_called = false
-                }
-            }
-        }
-    }, 
-    filter_blur: "...",
-    filter1: "...",
-    filter2: "...",
-    "f_o_get_mouse_relative_to_html_element": function(o_html_element){
+        }, 
+        filter_blur: "...",
+        filter1: "...",
+        filter2: "...",
+        "f_o_get_mouse_relative_to_html_element": function(o_html_element){
 
-        let rect = o_html_element.getBoundingClientRect();
-        var n_x_normalized = (window.event.clientX - rect.left) / rect.width
-        var n_y_normalized = (window.event.clientY - rect.top) / rect.height 
-        return {n_x_normalized: n_x_normalized, n_y_normalized: n_y_normalized}
-    }, 
+            let rect = o_html_element.getBoundingClientRect();
+            var n_x_normalized = (window.event.clientX - rect.left) / rect.width
+            var n_y_normalized = (window.event.clientY - rect.top) / rect.height 
+            return {n_x_normalized: n_x_normalized, n_y_normalized: n_y_normalized}
+        }, 
 
-    "style_test_another": {
-        background: "red",
+        "style_test_another": {
+            background: "red",
+        }
     }
-}
 
 o_json_to_html_demo.s_json_example_with_data = {
 
@@ -717,8 +732,128 @@ document.documentElement.appendChild(
         "o_data", // data parent object property name
     )
 )
-});
 
 
-// readme.md stuff
-// # convert json to html 
+}
+
+
+
+var f_simple_json_to_html_demo_with_data_and_changing_objects = function(){
+
+    // now , it can be the case, that not only a property with a value 
+    // like n_ number, s_ string, a_ array, b_ boolean, changes, but also 
+    // a whole object can be exchanged, 
+    // let's test it 
+
+    window.o_data = {
+        a: 1, 
+        b: {
+            c: 3,
+        },
+        a_nums: [1,2,3,4]
+    }
+    window.o_layout = {
+        
+        s_t: "div", 
+        a_c: [
+            {
+                s_t: "div", 
+                "class": "a",
+                "innerHTML<>": "a", 
+            }, 
+            {
+                s_t: "div", 
+                "class": "b.c", 
+                "innerHTML<>": "b.c"
+            },
+            // also arrays are not working yet
+            // {
+            //     s_t: "div", 
+            //     "class": "arraytest", 
+            //     "innerHTML<>": "a_nums[2]"
+            // }
+        ]
+
+    }
+
+    document.documentElement.appendChild(
+        o_json_to_html.f_json_to_html(
+            o_layout,
+            // o_json_to_html_demo.s_json_example_with_data2,
+            window, // data parent object, 
+            "o_data", // data parent object property name
+        )
+    )
+
+    // o_data.a = 2 // a simple property change, should still be linked 
+    // o_data.b = {c: 555} // a whole new object is set on property b
+    // o_data.b.a_o_other[0].object.o_proxy.innerHTML = "222" //now if we change the property on the linked object, it should change on the o_data aswell
+    // o_data.b = {c: 1234} // now it should update the properties aswell
+    // o_data.b.c = 4343434 
+
+}
+
+
+
+var f_simple_json_to_html_demo_with_data_and_changing_objects_with_nested_object = function(){
+
+    window.o_data = {
+        a: 1, 
+        b: {
+            c: {
+                d: 1
+            },
+            e: 2, 
+        }
+    }
+    window.o_layout = {
+        
+        s_t: "div", 
+        a_c: [
+            {
+                s_t: "div", 
+                "class": "a", 
+                "innerHTML<>": "a"
+            },
+            {
+                s_t: "div", 
+                "class": "b.e", 
+                "innerHTML<>": "b.e"
+            },
+            {
+                s_t: "div", 
+                "class": "b.c.d", 
+                "innerHTML<>": "b.c.d"
+            },
+            // also arrays are not working yet
+            // {
+            //     s_t: "div", 
+            //     "class": "arraytest", 
+            //     "innerHTML<>": "a_nums[2]"
+            // }
+        ]
+
+    }
+
+    document.documentElement.appendChild(
+        o_json_to_html.f_json_to_html(
+            o_layout,
+            // o_json_to_html_demo.s_json_example_with_data2,
+            window, // data parent object, 
+            "o_data", // data parent object property name
+        )
+    )
+    o_data.a = "a_workin?" // should work normal
+    o_data.b.c.d = "b.c.d working? "
+    o_data.b.e = "b.e workin? "
+    
+
+}
+
+// f_simple_html_to_json_demo()
+// f_simple_json_to_html_demo()
+// f_simple_json_to_html_demo_with_data()
+// f_simple_json_to_html_demo_with_data_and_changing_objects()
+f_simple_json_to_html_demo_with_data_and_changing_objects_with_nested_object()
+
+})

@@ -51,6 +51,11 @@ var o_html = o_json_to_html.f_o_javascript_object_to_html(
             {
                 s_t: "div", 
                 "class": "cover",
+                "style": "background-image:url('http://i.ibb.co/7RhFZmZ/tag.jpg'); width:30% !important; height:80vh !important;", 
+            }, 
+            {
+                s_t: "div", 
+                "class": "cover",
                 "style": "background-image:url('http://i.pinimg.com/originals/50/e3/f3/50e3f37c526db244557b4f2c3b0141e7.jpg'); width:100% !important; height:30vw !important;", 
             }, 
 
@@ -58,6 +63,11 @@ var o_html = o_json_to_html.f_o_javascript_object_to_html(
                 s_t: "div", 
                 "class": "cover",
                 "style": "background-image:url('http://i.pinimg.com/originals/50/e3/f3/50e3f37c526db244557b4f2c3b0141e7.jpg'); width:50% !important; height:100vh !important;", 
+            }, 
+            {
+                s_t: "div", 
+                "class": "cover",
+                "style": "background-image:url('http://i.pinimg.com/originals/50/e3/f3/50e3f37c526db244557b4f2c3b0141e7.jpg'); width:10% !important; height:100vh !important;", 
             }, 
             {
                 s_t: "div", 
@@ -71,6 +81,11 @@ var o_html = o_json_to_html.f_o_javascript_object_to_html(
             }, 
             {
                 s_t: "div", 
+                "class": "cover",
+                "style": "background-image:url('./image.png'); width:100%; height:100vh !important;", 
+            }, 
+            {
+                s_t: "div", 
                 "class": "div_img",
                 "style": "background: #ffffff url() no-repeat right top", 
             },
@@ -79,6 +94,12 @@ var o_html = o_json_to_html.f_o_javascript_object_to_html(
                 "class": "div_img",
                 "style": "background: #ffaaff no-repeat right top", 
             },  
+            {
+                s_t: "div", 
+                "class": "cover",
+                "style": "background-image:url('https://images.fineartamerica.com/images-medium-large-5/pal-tv-testing-widescreen-saad-hasnain.jpg'); width:10-% !important; padding-top:100%; background-repeat:no-repeat;", 
+            }, 
+            
             {
                 "s_t": "style", 
                 "s_inner_html": `

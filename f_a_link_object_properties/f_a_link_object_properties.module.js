@@ -66,6 +66,80 @@ var f_add_property_o_proxy = function(o_object){
     );
 }
 
+// if the new value is an object 
+// it has to have the same behavirour as the old object 
+// this means
+// - o_proxy must exist
+// - a_o_other (linked object and properties ) must exist
+// - setter on linked properties have to be triggered
+//      because the object can have nested childs which can have all the 
+//      same behaviours, this must all be done recusively
+var f_recursive_update_new_set_proxy_object = function(value_old, value){
+
+    if(value_old.a_o_other){
+        // pass the linked object, from the old one to the new one
+        Reflect.set(value, 'a_o_other', value_old.a_o_other)
+        // console.log(value)
+    }
+    // also exchange the object reference on the other object 
+    for(var n_index in value_old.a_o_other){
+        var o_other = value_old.a_o_other[n_index]
+        for(var n_index in o_other.object.a_o_other){
+            var o_other = o_other.object.a_o_other[n_index]
+            // debugger
+            var bool = o_other.object.o_proxy == value_old.o_proxy
+            // console.log("now")
+            // console.log(o_other.object.o_proxy)
+            // console.log(value_old)
+            if(o_other.object.o_proxy == value_old.o_proxy){
+                // debugger
+                // change the reference 
+                o_other.object = value
+            }
+        }    
+        // console.log(value_old.a_o_other[n_index])
+    }
+    if(!value.o_proxy){
+
+        f_add_property_o_proxy(value)
+    }
+    //now we have to trigger the setter on all linked properties, 
+    for(var n_index in value_old.a_o_other){
+        var o_other = value_old.a_o_other[n_index]
+        for(n_index in o_other.a_s_prop_other){
+            var s_prop = o_other.a_s_prop_other[n_index]
+            if(value[s_prop]){
+                var value_of_prop = value[s_prop]
+                // trigger the setter 
+                value.o_proxy[s_prop] = value_of_prop
+            }
+        }
+        
+    }
+    
+    // debugger
+    for(s_prop in value_old){
+        var s_prop_value = value_old[s_prop]
+
+        if(
+            !Array.isArray(s_prop_value) && 
+            typeof s_prop_value == "object"
+            ){
+                // check if new object has same 
+                // s_prop with value as object, 
+                // otherwise throw warning
+                if(!value[s_prop]){
+                    console.warn("data(types) should not change")
+                }
+
+                f_recursive_update_new_set_proxy_object(s_prop_value, value[s_prop])
+                // console.log(s_prop_value)
+                // console.log(value[s_prop])
+
+            }
+    }
+}
+
 var s_property_name_for_getter_setter_object = "o_getter_setter"
 var s_prefix_property_name_for_getter_function = "f_getter"
 var s_prefix_property_name_for_setter_function = "f_setter"
@@ -126,12 +200,39 @@ var o_proxy_handler =
             
         }
 
-        //if existing, call the setter function for this property
-        return Reflect.get(object, s_prop)
+        // if the requested value is an object, a proxy of it should be returned
+        // var value = object[s_prop]
+        // if(
+        //     !Array.isArray(value) &&
+        //     typeof value == 'object'
+        // ){
+        //     console.log(object)
+        //     return Reflect.get(object.o_proxy, s_prop)
+        // }else{
+            //if existing, call the setter function for this property
+            return Reflect.get(object, s_prop)
+        //}
     },
     set(object,s_prop,value){
         var value_old  = object[s_prop]
         // debugger
+
+        // if the new value is an object 
+        // it has to have the same behavirour as the old object 
+        // this means
+        // - o_proxy must exist
+        // - a_o_other (linked object and properties ) must exist
+        // - setter on linked properties have to be triggered
+        //      because the object can have nested childs which can have all the 
+        //      same behaviours, this must all be done recusively
+        if(value_old){
+            if(value_old.o_proxy){
+                if(typeof value == "object"){
+                    f_recursive_update_new_set_proxy_object(value_old, value)
+                }
+            }
+        }
+
 
         if(value instanceof O_value){
             var o_value = value
@@ -149,7 +250,14 @@ var o_proxy_handler =
                 console.warn(`the property name ${s_prop} is a reserved keyword property, using it can cause undefined behaviour`)
                 return false
             }
-            Reflect.set(object, s_prop, value)
+        
+            if(value.o_proxy){
+
+                Reflect.set(object, s_prop, value.o_proxy)
+            }else{
+                Reflect.set(object, s_prop, value)
+            }
+            
             o_value = new O_value(value)
         }
         // set the value for all the linked other objects
