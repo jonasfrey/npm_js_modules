@@ -74,66 +74,84 @@ var f_add_property_o_proxy = function(o_object){
 // - setter on linked properties have to be triggered
 //      because the object can have nested childs which can have all the 
 //      same behaviours, this must all be done recusively
-var f_recursive_update_new_set_proxy_object = function(value_old, value){
-
-    if(value_old.a_o_other){
-        // pass the linked object, from the old one to the new one
-        Reflect.set(value, 'a_o_other', value_old.a_o_other)
-        // console.log(value)
+var f_recursive_update_new_set_proxy_object = function(value_old, value_new, o_parent, s_prop_on_parent){
+    // console.log("f_recursive_update_new_set_proxy_object called")
+    // console.log("value_old, value_new, o_parent, s_prop_on_parent")
+    // console.log(value_old, value_new, o_parent, s_prop_on_parent)
+    if(value_new == null || value_old == null){
+        return false
     }
-    // also exchange the object reference on the other object 
-    for(var n_index in value_old.a_o_other){
-        var o_other = value_old.a_o_other[n_index]
-        for(var n_index in o_other.object.a_o_other){
-            var o_other = o_other.object.a_o_other[n_index]
-            // debugger
-            var bool = o_other.object.o_proxy == value_old.o_proxy
-            // console.log("now")
-            // console.log(o_other.object.o_proxy)
-            // console.log(value_old)
-            if(o_other.object.o_proxy == value_old.o_proxy){
-                // debugger
-                // change the reference 
-                o_other.object = value
+    if(!value_new.o_proxy){
+        f_add_property_o_proxy(value_new)
+        o_parent[s_prop_on_parent] = value_new.o_proxy
+        // console.log(value_new)
+    }
+
+    if(value_old.hasOwnProperty("a_o_other")){
+
+        // there can be objects, that are not linked to any other object
+        // but have child objects that are linked
+        // if object is not linked it does not have a_o_other
+        if(value_old.a_o_other){
+            // pass the linked object, from the old one to the new one
+            Reflect.set(value_new, 'a_o_other', value_old.a_o_other)
+            // console.log(value)
+        
+            // also exchange the object reference on the other object 
+            for(var n_index in value_old.a_o_other){
+                var o_other = value_old.a_o_other[n_index]
+                for(var n_index in o_other.object.a_o_other){
+                    var o_other = o_other.object.a_o_other[n_index]
+                    // debugger
+                    var bool = o_other.object.o_proxy == value_old.o_proxy
+                    // console.log("now")
+                    // console.log(o_other.object.o_proxy)
+                    // console.log(value_old)
+                    if(o_other.object.o_proxy == value_old.o_proxy){
+                        // debugger
+                        // change the reference 
+                        o_other.object = value_new
+                    }
+                }    
+                // console.log(value_old.a_o_other[n_index])
             }
-        }    
-        // console.log(value_old.a_o_other[n_index])
-    }
-    if(!value.o_proxy){
-
-        f_add_property_o_proxy(value)
-    }
-    //now we have to trigger the setter on all linked properties, 
-    for(var n_index in value_old.a_o_other){
-        var o_other = value_old.a_o_other[n_index]
-        for(n_index in o_other.a_s_prop_other){
-            var s_prop = o_other.a_s_prop_other[n_index]
-            if(value[s_prop]){
-                var value_of_prop = value[s_prop]
-                // trigger the setter 
-                value.o_proxy[s_prop] = value_of_prop
+    
+            //now we have to trigger the setter on all linked properties, 
+            for(var n_index in value_old.a_o_other){
+                var o_other = value_old.a_o_other[n_index]
+                for(n_index in o_other.a_s_prop_other){
+                    var s_prop = o_other.a_s_prop_other[n_index]
+                    if(value_new[s_prop]){
+                        var value_of_prop = value_new[s_prop]
+                        // trigger the setter 
+                        value_new.o_proxy[s_prop] = value_of_prop
+                    }
+                }
+                
             }
         }
-        
     }
-    
+
     // debugger
     for(s_prop in value_old){
-        var s_prop_value = value_old[s_prop]
-
+        var o_value_old_child = value_old[s_prop]
+        
         if(
-            !Array.isArray(s_prop_value) && 
-            typeof s_prop_value == "object"
+            !Array.isArray(o_value_old_child) && 
+            typeof o_value_old_child == "object"
             ){
                 // check if new object has same 
                 // s_prop with value as object, 
                 // otherwise throw warning
-                if(!value[s_prop]){
+                if(!value_new.hasOwnProperty(s_prop)){
                     console.warn("data(types) should not change")
+                    console.warn("property: "+s_prop+ " does not exists on " + value_+ " but it did exist on "+value_old)
                 }
-
-                f_recursive_update_new_set_proxy_object(s_prop_value, value[s_prop])
-                // console.log(s_prop_value)
+                if(value_new[s_prop]){
+                    f_recursive_update_new_set_proxy_object(o_value_old_child, value_new[s_prop], value_new, s_prop)
+                }
+                
+                // console.log(o_value_old_child)
                 // console.log(value[s_prop])
 
             }
@@ -214,6 +232,7 @@ var o_proxy_handler =
         //}
     },
     set(object,s_prop,value){
+        var n_ts_wpn = window.performance.now()
         var value_old  = object[s_prop]
         // debugger
 
@@ -225,10 +244,23 @@ var o_proxy_handler =
         // - setter on linked properties have to be triggered
         //      because the object can have nested childs which can have all the 
         //      same behaviours, this must all be done recusively
+        // if(value.n_ratio_n_height_to_n_width){
+        //     debugger
+        // }
+
         if(value_old){
-            if(value_old.o_proxy){
-                if(typeof value == "object"){
-                    f_recursive_update_new_set_proxy_object(value_old, value)
+            if(
+                value_old.hasOwnProperty("o_proxy")
+                && 
+                !value.hasOwnProperty("o_proxy")
+                ){
+                if(
+                    typeof value == "object"
+                    ){
+                        // console.log("s_prop")
+                        // console.log("calling f_recursive_update_new_set_proxy_object with s_prop")
+                        // console.log(s_prop)
+                    f_recursive_update_new_set_proxy_object(value_old, value, object, s_prop)
                 }
             }
         }
@@ -313,8 +345,9 @@ var o_proxy_handler =
             }
         
 
-        // o_value.a_o_object.push(object)
-
+        // console.info(
+        //     `setter took ${window.performance.now()-n_ts_wpn} milliseconds`
+        // )
         return true
     
     }

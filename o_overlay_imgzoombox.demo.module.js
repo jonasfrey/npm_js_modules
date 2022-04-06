@@ -11,6 +11,14 @@ var o_html = o_json_to_html.f_o_javascript_object_to_html(
                 "s_o_overlay_textbox": "this is a simple heading"
             }, 
             {
+                s_t: 'img', 
+                "src": "http://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Le_Jeu_Analogue.png/239px-Le_Jeu_Analogue.png"
+            },
+            {
+                s_t: "img", 
+                "src": "http://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Ryb-colorwheel.svg/1024px-Ryb-colorwheel.svg.png",
+            },
+            {
                 s_t: "img", 
                 "src": "http://ichef.bbci.co.uk/news/976/cpsprodpb/02C2/production/_122360700_gettyimages-1280424615.jpg", 
             }, 

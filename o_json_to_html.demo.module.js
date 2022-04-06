@@ -847,6 +847,8 @@ var f_simple_json_to_html_demo_with_data_and_changing_objects_with_nested_object
     o_data.b.c.d = "b.c.d working? "
     o_data.b.e = "b.e workin? "
     
+    o_data.b  = { c: { d: 324234 }, e: 1234, } // now if we change an object, which contains a nested object, 
+                                                // all linked properties should be 'relinked' and an update should be 'triggered' (the setter of the proxy should be called, which is done via .o_proxy.propname = propvalue)
 
 }
 

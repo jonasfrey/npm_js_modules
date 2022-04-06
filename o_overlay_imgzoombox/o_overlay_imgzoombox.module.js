@@ -34,16 +34,39 @@ class O_image{
     }
     f_update_o_image_pixel_hovered(n_x, n_y){
         var n_index = (n_x + n_y * this.o_pixel_data.width) * 4 // 4 because [r,g,b,a,r,g,b,a...] 4 items per pixel
-        this.o_image_pixel_hovered.n_n_rgba_max = this.n_pixel_data_max
-        this.o_image_pixel_hovered.n_n_rgba_max = this.n_pixel_data_max
-        this.o_image_pixel_hovered.n_r = this.o_pixel_data.data[n_index+0]
-        this.o_image_pixel_hovered.n_g = this.o_pixel_data.data[n_index+1]
-        this.o_image_pixel_hovered.n_b = this.o_pixel_data.data[n_index+2]
-        this.o_image_pixel_hovered.n_a = this.o_pixel_data.data[n_index+3]
-        this.o_image_pixel_hovered.n_r_normalized = this.o_image_pixel_hovered.n_r / this.o_image_pixel_hovered.n_n_rgba_max
-        this.o_image_pixel_hovered.n_g_normalized = this.o_image_pixel_hovered.n_g / this.o_image_pixel_hovered.n_n_rgba_max
-        this.o_image_pixel_hovered.n_b_normalized = this.o_image_pixel_hovered.n_b / this.o_image_pixel_hovered.n_n_rgba_max
-        this.o_image_pixel_hovered.n_a_normalized = this.o_image_pixel_hovered.n_a / this.o_image_pixel_hovered.n_n_rgba_max
+        var self = this
+
+        self.o_image_pixel_hovered.n_n_rgba_max = self.n_pixel_data_max
+        self.o_image_pixel_hovered.n_n_rgba_max = self.n_pixel_data_max
+        self.o_image_pixel_hovered.n_r = self.o_pixel_data.data[n_index+0]
+        self.o_image_pixel_hovered.n_g = self.o_pixel_data.data[n_index+1]
+        self.o_image_pixel_hovered.n_b = self.o_pixel_data.data[n_index+2]
+        self.o_image_pixel_hovered.n_a = self.o_pixel_data.data[n_index+3]
+        self.o_image_pixel_hovered.n_r_normalized = self.o_image_pixel_hovered.n_r / self.o_image_pixel_hovered.n_n_rgba_max
+        self.o_image_pixel_hovered.n_g_normalized = self.o_image_pixel_hovered.n_g / self.o_image_pixel_hovered.n_n_rgba_max
+        self.o_image_pixel_hovered.n_b_normalized = self.o_image_pixel_hovered.n_b / self.o_image_pixel_hovered.n_n_rgba_max
+        self.o_image_pixel_hovered.n_a_normalized = self.o_image_pixel_hovered.n_a / self.o_image_pixel_hovered.n_n_rgba_max
+
+        self.o_image_pixel_hovered.n_r_normalized_o_style = {
+            // height: (self.o_image_pixel_hovered.n_r_normalized*10)+'px', 
+            width: (self.o_image_pixel_hovered.n_r_normalized*100)+'%', 
+            "background-color": "red",
+        };
+        self.o_image_pixel_hovered.n_g_normalized_o_style = {
+            // height: (self.o_image_pixel_hovered.n_g_normalized*10)+'px', 
+            width: (self.o_image_pixel_hovered.n_g_normalized*100)+'%', 
+            "background-color": "green",
+        };
+        self.o_image_pixel_hovered.n_b_normalized_o_style = {
+            // height: (self.o_image_pixel_hovered.n_b_normalized*10)+'px', 
+            width: (self.o_image_pixel_hovered.n_b_normalized*100)+'%', 
+            "background-color": "blue",
+        };
+        self.o_image_pixel_hovered.n_a_normalized_o_style = {
+            // height: (self.o_image_pixel_hovered.n_a_normalized*10)+'px', 
+            width: (self.o_image_pixel_hovered.n_a_normalized*100)+'%', 
+            "background-color": "rgba(244,244,244,0.5)",
+        };
 
     }
 }
@@ -63,9 +86,29 @@ class O_image_pixel{
         this.n_b = 0;
         this.n_a = 0;
         this.n_r_normalized = 0;
+        this.n_r_normalized_o_style = {
+            width: '10px', 
+            height: '10px', 
+            "background-color": "red",
+        };
         this.n_g_normalized = 0;
+        this.n_g_normalized_o_style = {
+            width: '10px', 
+            height: '10px', 
+            "background-color": "red",
+        };
         this.n_b_normalized = 0;
+        this.n_b_normalized_o_style = {
+            width: '10px', 
+            height: '10px', 
+            "background-color": "red",
+        };
         this.n_a_normalized = 0;
+        this.n_a_normalized_o_style = {
+            width: '10px', 
+            height: '10px', 
+            "background-color": "red",
+        };
         this.n_n_rgba_max = 255;//255=>2^8 // if uint16 array, 65k(2^16)
     }
 }
@@ -90,7 +133,17 @@ class O_overlay_imgzoombox{
             o_computed_style_property_values: {}
         }
         this.o_data = {
+            a:{
+                b:{
 
+                    n_r_normalized: 0, 
+                    n_g_normalized: 0, 
+                    n_b_normalized: 0, 
+                    n_a_normalized: 0, 
+                }
+                
+            },
+            o_image_pixel_hovered: new O_image_pixel(),
             b_drag_locked: false, 
             o_mouse: {
                 o_point_2_d_relative_to_img: new O_point_2_d(), 
@@ -137,7 +190,7 @@ class O_overlay_imgzoombox{
 
             // console.log(event.target)
             self.o_data.o_mouse.o_point_2_d_relative_to_window_last = self.o_data.o_mouse.o_point_2_d_relative_to_window
-            self.o_data.o_mouse.o_point_2_d_relative_to_window = new O_point_2_d()
+
             self.o_data.o_mouse.o_point_2_d_relative_to_window.n_x = event.clientX
             self.o_data.o_mouse.o_point_2_d_relative_to_window.n_y = event.clientY
             self.o_data.o_mouse.o_point_2_d_relative_to_window.n_x_normalized = event.clientY / window.innerWidth
@@ -174,6 +227,7 @@ class O_overlay_imgzoombox{
                 !o_image
                 ){
                 self.o_data.o_image = new O_image()
+                
                 self.o_data.o_image.s_url = s_url
                 self.o_data.a_o_image.push(self.o_data.o_image)
                 self.f_do_canvas_stuff(event)
@@ -186,13 +240,23 @@ class O_overlay_imgzoombox{
             }
 
             if(self.o_data.o_image.o_pixel_data){
-                // console.log(self.o_data.o_image.o_pixel_data)
+
 
                 self.o_data.o_image.f_update_o_image_pixel_hovered(
                     self.o_data.o_mouse.o_point_2_d_relative_to_img.n_x, 
                     self.o_data.o_mouse.o_point_2_d_relative_to_img.n_y 
                 )
-                console.log(self.o_data.o_image.o_image_pixel_hovered)
+                // self.o_data.a.b.n_r_normalized = self.o_data.o_image.o_image_pixel_hovered.n_r_normalized 
+                // self.o_data.a.b.n_g_normalized = self.o_data.o_image.o_image_pixel_hovered.n_g_normalized 
+                // self.o_data.a.b.n_b_normalized = self.o_data.o_image.o_image_pixel_hovered.n_b_normalized 
+                // self.o_data.a.b.n_a_normalized = self.o_data.o_image.o_image_pixel_hovered.n_a_normalized 
+                
+                self.o_data.o_image_pixel_hovered.n_r_normalized = self.o_data.o_image.o_image_pixel_hovered.n_r_normalized 
+                self.o_data.o_image_pixel_hovered.n_g_normalized = self.o_data.o_image.o_image_pixel_hovered.n_g_normalized 
+                self.o_data.o_image_pixel_hovered.n_b_normalized = self.o_data.o_image.o_image_pixel_hovered.n_b_normalized 
+                self.o_data.o_image_pixel_hovered.n_a_normalized = self.o_data.o_image.o_image_pixel_hovered.n_a_normalized 
+
+                
             }
             
         }
@@ -296,11 +360,13 @@ class O_overlay_imgzoombox{
         
 
         try{
+
             var o_img = new Image();
             if(self.o_data.o_image.s_url.split('/')[2] != window.location.href.split('/')[2]){
                 o_img.crossOrigin = "Anonymous"
             }
             o_img.addEventListener("load", function () {
+                // alert("loaded img")
                 // The image can be drawn from any source
                 self.o_canvas_context.drawImage(o_img, 0, 0, o_img.width,    o_img.height, 0, 0, self.o_canvas.width, self.o_canvas.height);
                 self.o_data.o_image.o_pixel_data = self.o_canvas_context.getImageData(0, 0, br.width,br.height)
@@ -529,6 +595,9 @@ class O_overlay_imgzoombox{
                                                     {
                                                         "innerHTML<>": "o_image.o_image_pixel_hovered.n_r_normalized"
                                                     },
+                                                    {
+                                                        "style<>": "o_image.o_image_pixel_hovered.n_r_normalized_o_style"
+                                                    },
                                                 ]
                                             },
                                             {
@@ -540,6 +609,10 @@ class O_overlay_imgzoombox{
                                                     {
                                                         "innerHTML<>": "o_image.o_image_pixel_hovered.n_g_normalized"
                                                     },
+                                                    {
+                                                        "style<>": "o_image.o_image_pixel_hovered.n_g_normalized_o_style"
+                                                    }
+
                                                 ]
                                             },
                                             {
@@ -551,6 +624,10 @@ class O_overlay_imgzoombox{
                                                     {
                                                         "innerHTML<>": "o_image.o_image_pixel_hovered.n_b_normalized"
                                                     },
+                                                    {
+                                                        "style<>": "o_image.o_image_pixel_hovered.n_b_normalized_o_style"
+                                                    }
+
                                                 ]
                                             },
                                             {
@@ -562,12 +639,16 @@ class O_overlay_imgzoombox{
                                                     {
                                                         "innerHTML<>": "o_image.o_image_pixel_hovered.n_a_normalized"
                                                     },
+                                                    {
+                                                        "style<>": "o_image.o_image_pixel_hovered.n_a_normalized_o_style"
+                                                    }
+
                                                 ]
                                             },
-                                            {
-                                                "class": "n_rgba_max", 
-                                                "innerText<>": "o_image.o_image_pixel_hovered.n_n_rgba_max"
-                                            }
+                                            // {
+                                            //     "class": "n_rgba_max", 
+                                            //     "innerText<>": "o_image.o_image_pixel_hovered.n_n_rgba_max"
+                                            // }
                          
                                         ]
                                     },
