@@ -30,6 +30,9 @@ class O_image{
         this.n_pixel_data_max = 0; // Math.pow(2,(this.o_pixel_data.data.BYTES_PER_ELEMENT * 8)) 2^8 , 2^16, 2^32
         this.s_url =  ''
         this.o_image_pixel_hovered = new O_image_pixel()
+        this.o_mouse_position_preview_image_style = {
+            "aspect-ratio":"1 / 1"
+        }
 
     }
     f_update_o_image_pixel_hovered(n_x, n_y){
@@ -46,6 +49,11 @@ class O_image{
         self.o_image_pixel_hovered.n_g_normalized = self.o_image_pixel_hovered.n_g / self.o_image_pixel_hovered.n_n_rgba_max
         self.o_image_pixel_hovered.n_b_normalized = self.o_image_pixel_hovered.n_b / self.o_image_pixel_hovered.n_n_rgba_max
         self.o_image_pixel_hovered.n_a_normalized = self.o_image_pixel_hovered.n_a / self.o_image_pixel_hovered.n_n_rgba_max
+        
+        self.o_image_pixel_hovered.n_r_normalized_tofixed3 = self.o_image_pixel_hovered.n_r_normalized.toFixed(3)
+        self.o_image_pixel_hovered.n_g_normalized_tofixed3 = self.o_image_pixel_hovered.n_g_normalized.toFixed(3)
+        self.o_image_pixel_hovered.n_b_normalized_tofixed3 = self.o_image_pixel_hovered.n_b_normalized.toFixed(3)
+        self.o_image_pixel_hovered.n_a_normalized_tofixed3 = self.o_image_pixel_hovered.n_a_normalized.toFixed(3)
 
         self.o_image_pixel_hovered.n_r_normalized_o_style = {
             // height: (self.o_image_pixel_hovered.n_r_normalized*10)+'px', 
@@ -86,24 +94,29 @@ class O_image_pixel{
         this.n_b = 0;
         this.n_a = 0;
         this.n_r_normalized = 0;
+        this.n_g_normalized = 0;
+        this.n_b_normalized = 0;
+        this.n_a_normalized = 0;
+        this.n_r_normalized_tofixed3 = 0;
+        this.n_g_normalized_tofixed3 = 0;
+        this.n_b_normalized_tofixed3 = 0;
+        this.n_a_normalized_tofixed3 = 0;
+
         this.n_r_normalized_o_style = {
             width: '10px', 
             height: '10px', 
             "background-color": "red",
         };
-        this.n_g_normalized = 0;
         this.n_g_normalized_o_style = {
             width: '10px', 
             height: '10px', 
             "background-color": "red",
         };
-        this.n_b_normalized = 0;
         this.n_b_normalized_o_style = {
             width: '10px', 
             height: '10px', 
             "background-color": "red",
         };
-        this.n_a_normalized = 0;
         this.n_a_normalized_o_style = {
             width: '10px', 
             height: '10px', 
@@ -111,6 +124,7 @@ class O_image_pixel{
         };
         this.n_n_rgba_max = 255;//255=>2^8 // if uint16 array, 65k(2^16)
     }
+
 }
 window.O_image_pixel = O_image_pixel 
 
@@ -149,6 +163,10 @@ class O_overlay_imgzoombox{
                 o_point_2_d_relative_to_img: new O_point_2_d(), 
                 o_point_2_d_relative_to_window: new O_point_2_d(), 
                 o_point_2_d_relative_to_window_last: new O_point_2_d(), 
+                o_mouse_position_preview_image_mouse_cursor_style: {
+                    left: "0%", 
+                    top: "0%"
+                }
             },
             o_overlay_box: {
                 n_left: 0, 
@@ -330,6 +348,8 @@ class O_overlay_imgzoombox{
         self.o_data.o_image.n_height = br.height; 
         self.o_data.o_image.n_ratio_n_width_to_n_height = br.width/ br.height; 
         self.o_data.o_image.n_ratio_n_height_to_n_width = br.height / br.width; 
+        self.o_data.o_image.o_mouse_position_preview_image_style["aspect-ratio"] = 
+            `${self.o_data.o_image.n_width} / ${self.o_data.o_image.n_height}`
 
         self.f_get_image_data()
         // self.f_get_image_data(event, true, function(){
@@ -450,8 +470,13 @@ class O_overlay_imgzoombox{
         self.o_data.o_mouse.o_point_2_d_relative_to_img.n_x = parseInt(event.clientX - self.o_data.o_mouse.o_image_bounding_rect.left)
         self.o_data.o_mouse.o_point_2_d_relative_to_img.n_y = parseInt(event.clientY - self.o_data.o_mouse.o_image_bounding_rect.top)
         
-        self.o_data.o_mouse.o_point_2_d_relative_to_img.n_x_normalized = self.o_data.o_mouse.o_point_2_d_relative_to_img.n_x / self.o_data.o_mouse.o_image_bounding_rect.width
-        self.o_data.o_mouse.o_point_2_d_relative_to_img.n_y_normalized = self.o_data.o_mouse.o_point_2_d_relative_to_img.n_y / self.o_data.o_mouse.o_image_bounding_rect.height 
+        self.o_data.o_mouse.o_point_2_d_relative_to_img.n_x_normalized = self.o_data.o_mouse.o_point_2_d_relative_to_img.n_x / self.o_data.o_image.n_width
+        self.o_data.o_mouse.o_point_2_d_relative_to_img.n_y_normalized = self.o_data.o_mouse.o_point_2_d_relative_to_img.n_y / self.o_data.o_image.n_height
+        
+        self.o_data.o_mouse.o_mouse_position_preview_image_mouse_cursor_style.left = 
+            `${self.o_data.o_mouse.o_point_2_d_relative_to_img.n_x_normalized*100}%` 
+        self.o_data.o_mouse.o_mouse_position_preview_image_mouse_cursor_style.top = 
+            `${self.o_data.o_mouse.o_point_2_d_relative_to_img.n_y_normalized*100}%` 
         
     
         self.o_data.o_image.n_factor_normalizing_x = 1
@@ -567,8 +592,76 @@ class O_overlay_imgzoombox{
                                 "class": "top bar", 
                                 "a_c": [
                                     {
+                                        "class": "open_in_new_tab",
+                                        "a_c" :[
+                                            {
+                                                "t": "i",
+                                                "class": "fa-solid fa-image",
+                                            },
+                                            {
+                                                "t": "i",
+                                                "class": "fa-solid fa-up-right-from-square",
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "class": "expand",
+                                        "onclick": function(){
+                                            this.b_expanded = !this.b_expanded
+                                        }
+                                    },
+
+                                ]
+                            }, 
+                            {
+                                "class":"left_bar", 
+                                "a_c":[
+                                    {
                                         "class": "mouse position", 
                                         "a_c": [
+                                            {
+                                                "class": "mouse_position_preview",
+                                                "a_c": [
+                                                    {
+                                                        "class": "mouse_position_preview_image",
+                                                        "style<>": "o_image.o_mouse_position_preview_image_style", 
+                                                        "a_c": [
+                                                            {
+                                                                "class": "mouse_cursor", 
+                                                                "style<>": "o_mouse.o_mouse_position_preview_image_mouse_cursor_style"
+                                                            }, 
+                                                            {
+                                                                "class": "image_width", 
+                                                                "a_c": [
+                                                                    {
+                                                                        "s_t": "span", 
+                                                                        "s_inner_text":"width: "
+                                                                    },
+                                                                    {
+                                                                        "s_t": "span", 
+                                                                        "innerText<>":"o_image.n_width"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                "class": "image_height", 
+                                                                "a_c": [
+                                                                    {
+                                                                        "s_t": "span", 
+                                                                        "s_inner_text":"height: "
+                                                                    },
+                                                                    {
+                                                                        "s_t": "span", 
+                                                                        "innerText<>":"o_image.n_height"
+                                                                    }
+                                                                ]
+                                                            }, 
+        
+                                                        ]
+                                                    },
+
+                                                ]
+                                            },
                                             {
                                                 "s_inner_text":"x: "
                                             },
@@ -593,7 +686,7 @@ class O_overlay_imgzoombox{
                                                         "s_inner_text": "r:"
                                                     }, 
                                                     {
-                                                        "innerHTML<>": "o_image.o_image_pixel_hovered.n_r_normalized"
+                                                        "innerHTML<>": "o_image.o_image_pixel_hovered.n_r_normalized_tofixed3"
                                                     },
                                                     {
                                                         "style<>": "o_image.o_image_pixel_hovered.n_r_normalized_o_style"
@@ -607,7 +700,7 @@ class O_overlay_imgzoombox{
                                                         "s_inner_text": "g:"
                                                     }, 
                                                     {
-                                                        "innerHTML<>": "o_image.o_image_pixel_hovered.n_g_normalized"
+                                                        "innerHTML<>": "o_image.o_image_pixel_hovered.n_g_normalized_tofixed3"
                                                     },
                                                     {
                                                         "style<>": "o_image.o_image_pixel_hovered.n_g_normalized_o_style"
@@ -622,7 +715,7 @@ class O_overlay_imgzoombox{
                                                         "s_inner_text": "b:"
                                                     }, 
                                                     {
-                                                        "innerHTML<>": "o_image.o_image_pixel_hovered.n_b_normalized"
+                                                        "innerHTML<>": "o_image.o_image_pixel_hovered.n_b_normalized_tofixed3"
                                                     },
                                                     {
                                                         "style<>": "o_image.o_image_pixel_hovered.n_b_normalized_o_style"
@@ -652,28 +745,8 @@ class O_overlay_imgzoombox{
                          
                                         ]
                                     },
-                                    {
-                                        "class": "open_in_new_tab",
-                                        "a_c" :[
-                                            {
-                                                "t": "i",
-                                                "class": "fa-solid fa-image",
-                                            },
-                                            {
-                                                "t": "i",
-                                                "class": "fa-solid fa-up-right-from-square",
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        "class": "expand",
-                                        "onclick": function(){
-                                            this.b_expanded = !this.b_expanded
-                                        }
-                                    },
-
                                 ]
-                            }, 
+                            },
                             {
                                 "class": "img_preview", 
                                 "a_c": [
@@ -764,6 +837,30 @@ class O_overlay_imgzoombox{
                                 width:100%; 
                                 height:auto;
                                 image-rendering: pixelated;
+                            }
+                            .mouse_position_preview{
+                                aspect-ratio:1/1;
+                            }
+                            .mouse_position_preview_image{
+                                max-height: 100%;
+                                max-width: 100%;
+                                position: relative;
+                                border: 1px solid white;
+                                display: flex;
+                            }
+                            .mouse_cursor{
+                                position:absolute;
+                                width:1px; 
+                                height:1px;
+                                background:white;
+                            }
+                            .image_height {
+                                position: absolute;
+                                transform: rotate(90deg);
+                                left: 100%;
+                                display: flex;
+                                flex-direction: row;
+                                transform-origin: left top;
                             }
                         `
                     }

@@ -75,7 +75,10 @@ var f_add_property_o_proxy = function(o_object){
 //      because the object can have nested childs which can have all the 
 //      same behaviours, this must all be done recusively
 var f_recursive_update_new_set_proxy_object = function(value_old, value_new, o_parent, s_prop_on_parent){
-    // console.log("f_recursive_update_new_set_proxy_object called")
+
+    if(value_new == value_old){
+        return false
+    }
     // console.log("value_old, value_new, o_parent, s_prop_on_parent")
     // console.log(value_old, value_new, o_parent, s_prop_on_parent)
     if(value_new == null || value_old == null){
@@ -251,8 +254,10 @@ var o_proxy_handler =
         if(value_old){
             if(
                 value_old.hasOwnProperty("o_proxy")
-                && 
-                !value.hasOwnProperty("o_proxy")
+                // we have to recursively update the properties every time, 
+                // no matter if the object is a new one without a proxy or an existing one with a proxy
+                // && 
+                // !value.hasOwnProperty("o_proxy")
                 ){
                 if(
                     typeof value == "object"
