@@ -57,23 +57,27 @@ class O_image{
 
         self.o_image_pixel_hovered.n_r_normalized_o_style = {
             // height: (self.o_image_pixel_hovered.n_r_normalized*10)+'px', 
-            width: (self.o_image_pixel_hovered.n_r_normalized*100)+'%', 
-            "background-color": "red",
+            // width: (self.o_image_pixel_hovered.n_r_normalized*100)+'%', 
+            // "background-color": "red",
+            "background-color": `rgba(${self.o_image_pixel_hovered.n_r_normalized*255},0,0,1)`
         };
         self.o_image_pixel_hovered.n_g_normalized_o_style = {
             // height: (self.o_image_pixel_hovered.n_g_normalized*10)+'px', 
-            width: (self.o_image_pixel_hovered.n_g_normalized*100)+'%', 
-            "background-color": "green",
+            // width: (self.o_image_pixel_hovered.n_g_normalized*100)+'%', 
+            // "background-color": "green",
+            "background-color": `rgba(0,${self.o_image_pixel_hovered.n_g_normalized*255},0,1)`
         };
         self.o_image_pixel_hovered.n_b_normalized_o_style = {
             // height: (self.o_image_pixel_hovered.n_b_normalized*10)+'px', 
-            width: (self.o_image_pixel_hovered.n_b_normalized*100)+'%', 
-            "background-color": "blue",
+            // width: (self.o_image_pixel_hovered.n_b_normalized*100)+'%', 
+            // "background-color": "blue",
+            "background-color": `rgba(0,0,${self.o_image_pixel_hovered.n_b_normalized*255},1)`
         };
         self.o_image_pixel_hovered.n_a_normalized_o_style = {
             // height: (self.o_image_pixel_hovered.n_a_normalized*10)+'px', 
-            width: (self.o_image_pixel_hovered.n_a_normalized*100)+'%', 
-            "background-color": "rgba(244,244,244,0.5)",
+            // width: (self.o_image_pixel_hovered.n_a_normalized*100)+'%', 
+            // "background-color": "rgba(244,244,244,0.5)",
+            "background-color": `rgba(255,255,255,${self.o_image_pixel_hovered.n_a_normalized})`
         };
 
     }
@@ -103,23 +107,15 @@ class O_image_pixel{
         this.n_a_normalized_tofixed3 = 0;
 
         this.n_r_normalized_o_style = {
-            width: '10px', 
-            height: '10px', 
             "background-color": "red",
         };
         this.n_g_normalized_o_style = {
-            width: '10px', 
-            height: '10px', 
             "background-color": "red",
         };
         this.n_b_normalized_o_style = {
-            width: '10px', 
-            height: '10px', 
             "background-color": "red",
         };
         this.n_a_normalized_o_style = {
-            width: '10px', 
-            height: '10px', 
             "background-color": "red",
         };
         this.n_n_rgba_max = 255;//255=>2^8 // if uint16 array, 65k(2^16)
@@ -135,7 +131,6 @@ class O_overlay_imgzoombox{
         this.o_json_to_html = new O_json_to_html()
         this.s_class_name = this.constructor.name.toLowerCase() 
         this.s_attribute_name = "s_"+this.constructor.name.toLowerCase() 
-        this.n_px_max_width = 350;
         this.n_px_margin = 20
         this.o_cached_s_text_html_content = null
         this.o_canvas = document.createElement("canvas")
@@ -207,7 +202,7 @@ class O_overlay_imgzoombox{
             self.o_hovered_element.o_html_element = event.target
 
             // console.log(event.target)
-            self.o_data.o_mouse.o_point_2_d_relative_to_window_last = self.o_data.o_mouse.o_point_2_d_relative_to_window
+            self.o_data.o_mouse.o_point_2_d_relative_to_window_last = JSON.parse(JSON.stringify(self.o_data.o_mouse.o_point_2_d_relative_to_window))
 
             self.o_data.o_mouse.o_point_2_d_relative_to_window.n_x = event.clientX
             self.o_data.o_mouse.o_point_2_d_relative_to_window.n_y = event.clientY
@@ -309,6 +304,7 @@ class O_overlay_imgzoombox{
         var mouse_delta_x = self.o_data.o_mouse.o_point_2_d_relative_to_window.n_x - self.o_data.o_mouse.o_point_2_d_relative_to_window_last.n_x
         var mouse_delta_y = self.o_data.o_mouse.o_point_2_d_relative_to_window.n_y - self.o_data.o_mouse.o_point_2_d_relative_to_window_last.n_y
         if(self.o_data.b_drag_locked){
+
             self.o_data.o_overlay_box.o_style.boxShadow = "0 4px 10px 2px rgb(64 60 67 / 16%)";
             self.o_data.o_overlay_box.n_left += mouse_delta_x
             self.o_data.o_overlay_box.n_top += mouse_delta_y         
@@ -322,13 +318,16 @@ class O_overlay_imgzoombox{
     }
     f_on_mousedown(event){
         var self = this;
-        
+        // console.log("f_on_mousedown called");
         if(self.o_html_element.contains(
             event.target
         )){
             event.preventDefault()
             self.o_data.b_drag_locked = true; 
         }
+        // console.log("self.o_data.b_drag_locked");
+        // console.log(self.o_data.b_drag_locked);
+
     }
     f_on_mouseup(){
         var self = this
@@ -588,165 +587,7 @@ class O_overlay_imgzoombox{
                         "class": this.s_class_name,
                         "style<>": "o_overlay_box.o_style",
                         "a_c": [
-                            {
-                                "class": "top bar", 
-                                "a_c": [
-                                    {
-                                        "class": "open_in_new_tab",
-                                        "a_c" :[
-                                            {
-                                                "t": "i",
-                                                "class": "fa-solid fa-image",
-                                            },
-                                            {
-                                                "t": "i",
-                                                "class": "fa-solid fa-up-right-from-square",
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        "class": "expand",
-                                        "onclick": function(){
-                                            this.b_expanded = !this.b_expanded
-                                        }
-                                    },
 
-                                ]
-                            }, 
-                            {
-                                "class":"left_bar", 
-                                "a_c":[
-                                    {
-                                        "class": "mouse position", 
-                                        "a_c": [
-                                            {
-                                                "class": "mouse_position_preview",
-                                                "a_c": [
-                                                    {
-                                                        "class": "mouse_position_preview_image",
-                                                        "style<>": "o_image.o_mouse_position_preview_image_style", 
-                                                        "a_c": [
-                                                            {
-                                                                "class": "mouse_cursor", 
-                                                                "style<>": "o_mouse.o_mouse_position_preview_image_mouse_cursor_style"
-                                                            }, 
-                                                            {
-                                                                "class": "image_width", 
-                                                                "a_c": [
-                                                                    {
-                                                                        "s_t": "span", 
-                                                                        "s_inner_text":"width: "
-                                                                    },
-                                                                    {
-                                                                        "s_t": "span", 
-                                                                        "innerText<>":"o_image.n_width"
-                                                                    }
-                                                                ]
-                                                            },
-                                                            {
-                                                                "class": "image_height", 
-                                                                "a_c": [
-                                                                    {
-                                                                        "s_t": "span", 
-                                                                        "s_inner_text":"height: "
-                                                                    },
-                                                                    {
-                                                                        "s_t": "span", 
-                                                                        "innerText<>":"o_image.n_height"
-                                                                    }
-                                                                ]
-                                                            }, 
-        
-                                                        ]
-                                                    },
-
-                                                ]
-                                            },
-                                            {
-                                                "s_inner_text":"x: "
-                                            },
-                                            {
-                                                "innerText<>":"o_mouse.o_point_2_d_relative_to_img.n_x"
-                                            },
-                                            {
-                                                "s_inner_text":"y: "
-                                            },
-                                            {
-                                                "innerText<>":"o_mouse.o_point_2_d_relative_to_img.n_y"
-                                            },
-                                        ], 
-                                    }, 
-                                    {
-                                        "class": "mouse pixel", 
-                                        "a_c": [
-                                            {
-                                                "class": "r", 
-                                                "a_c" : [
-                                                    {
-                                                        "s_inner_text": "r:"
-                                                    }, 
-                                                    {
-                                                        "innerHTML<>": "o_image.o_image_pixel_hovered.n_r_normalized_tofixed3"
-                                                    },
-                                                    {
-                                                        "style<>": "o_image.o_image_pixel_hovered.n_r_normalized_o_style"
-                                                    },
-                                                ]
-                                            },
-                                            {
-                                                "class": "g", 
-                                                "a_c" : [
-                                                    {
-                                                        "s_inner_text": "g:"
-                                                    }, 
-                                                    {
-                                                        "innerHTML<>": "o_image.o_image_pixel_hovered.n_g_normalized_tofixed3"
-                                                    },
-                                                    {
-                                                        "style<>": "o_image.o_image_pixel_hovered.n_g_normalized_o_style"
-                                                    }
-
-                                                ]
-                                            },
-                                            {
-                                                "class": "b", 
-                                                "a_c" : [
-                                                    {
-                                                        "s_inner_text": "b:"
-                                                    }, 
-                                                    {
-                                                        "innerHTML<>": "o_image.o_image_pixel_hovered.n_b_normalized_tofixed3"
-                                                    },
-                                                    {
-                                                        "style<>": "o_image.o_image_pixel_hovered.n_b_normalized_o_style"
-                                                    }
-
-                                                ]
-                                            },
-                                            {
-                                                "class": "a", 
-                                                "a_c" : [
-                                                    {
-                                                        "s_inner_text": "a:"
-                                                    }, 
-                                                    {
-                                                        "innerHTML<>": "o_image.o_image_pixel_hovered.n_a_normalized"
-                                                    },
-                                                    {
-                                                        "style<>": "o_image.o_image_pixel_hovered.n_a_normalized_o_style"
-                                                    }
-
-                                                ]
-                                            },
-                                            // {
-                                            //     "class": "n_rgba_max", 
-                                            //     "innerText<>": "o_image.o_image_pixel_hovered.n_n_rgba_max"
-                                            // }
-                         
-                                        ]
-                                    },
-                                ]
-                            },
                             {
                                 "class": "img_preview", 
                                 "a_c": [
@@ -758,25 +599,217 @@ class O_overlay_imgzoombox{
                                         "class": "center",
                                         "style<>": "o_img_zoomed.o_center.o_style",
                                     },
-
-                                ]
-                            },
-                            {
-                                "class": "bottom bar",
-                                "a_c": [
                                     {
-                                        "class": "zoom factor",
+                                        "class": "top bar", 
                                         "a_c": [
                                             {
-                                                "s_inner_text": "mousewheel to change zoom factor: "
+                                                "class": "open_in_new_tab",
+                                                "a_c" :[
+                                                    {
+                                                        "t": "i",
+                                                        "class": "fa-solid fa-image",
+                                                    },
+                                                    {
+                                                        "t": "i",
+                                                        "class": "fa-solid fa-up-right-from-square",
+                                                    }
+                                                ]
                                             },
                                             {
-                                                "innerText<>": "o_img_zoomed.n_scale_factor"
+                                                "class": "expand",
+                                                "onclick": function(){
+                                                    this.b_expanded = !this.b_expanded
+                                                }
+                                            },
+        
+                                        ]
+                                    }, 
+                                    {
+                                        "class": "middle bar", 
+                                        "a_c": [
+                                            {
+                                                "class":"left bar", 
+                                                "a_c":[
+                                                    {
+                                                        "class": "mouse position", 
+                                                        "a_c": [
+                                                            {
+                                                                "class": "mouse_position_preview",
+                                                                "a_c": [
+                                                                    {
+                                                                        "class": "mouse_position_preview_image",
+                                                                        "style<>": "o_image.o_mouse_position_preview_image_style", 
+                                                                        "a_c": [
+                                                                            {
+                                                                                "class": "mouse_cursor", 
+                                                                                "style<>": "o_mouse.o_mouse_position_preview_image_mouse_cursor_style"
+                                                                            }, 
+                                                                            {
+                                                                                "class": "image_width", 
+                                                                                "a_c": [
+                                                                                    {
+                                                                                        "s_t": "span", 
+                                                                                        "s_inner_text":"W:"
+                                                                                    },
+                                                                                    {
+                                                                                        "s_t": "span", 
+                                                                                        "innerText<>":"o_image.n_width"
+                                                                                    }
+                                                                                ]
+                                                                            },
+                                                                            {
+                                                                                "class": "image_height", 
+                                                                                "a_c": [
+                                                                                    {
+                                                                                        "s_t": "span", 
+                                                                                        "s_inner_text":"H:"
+                                                                                    },
+                                                                                    {
+                                                                                        "s_t": "span", 
+                                                                                        "innerText<>":"o_image.n_height"
+                                                                                    }
+                                                                                ]
+                                                                            }, 
+                        
+                                                                        ]
+                                                                    },
+                
+                                                                ]
+                                                            },
+                                                            {
+                                                                "s_t": "span",
+                                                                "s_inner_text":"x: "
+                                                            },
+                                                            {
+                                                                "s_t": "span",
+                                                                "innerText<>":"o_mouse.o_point_2_d_relative_to_img.n_x"
+                                                            },
+                                                            {
+                                                                "class": "space",
+                                                            },
+                                                            {
+                                                                "s_t": "span",
+                                                                "s_inner_text":"y: "
+                                                            },
+                                                            {
+                                                                "s_t": "span",
+                                                                "innerText<>":"o_mouse.o_point_2_d_relative_to_img.n_y"
+                                                            },
+                                                        ], 
+                                                    }, 
+                                                    {
+                                                        "class": "mouse pixel", 
+                                                        "a_c": [
+                                                            {
+                                                                "class": "r",
+                                                                "style<>": "o_image.o_image_pixel_hovered.n_r_normalized_o_style" ,
+                                                                "a_c" : [
+                                                                    {
+                                                                        "class": "text",
+                                                                        "a_c":[
+                                                                            {
+                                                                                "s_t": "span",
+                                                                                "s_inner_text": "r:"
+                                                                            }, 
+                                                                            {
+                                                                                "s_t": "sapn",
+                                                                                "innerHTML<>": "o_image.o_image_pixel_hovered.n_r_normalized_tofixed3"
+                                                                            },
+                                                                        
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                "class": "g",
+                                                                "style<>": "o_image.o_image_pixel_hovered.n_g_normalized_o_style" ,
+                                                                "a_c" : [
+                                                                    {
+                                                                        "class": "text",
+                                                                        "a_c":[
+                                                                            {
+                                                                                "s_t": "span",
+                                                                                "s_inner_text": "g:"
+                                                                            }, 
+                                                                            {
+                                                                                "s_t": "sapn",
+                                                                                "innerHTML<>": "o_image.o_image_pixel_hovered.n_g_normalized_tofixed3"
+                                                                            },
+                                                                        ]
+                                                                    }
+                
+                                                                ]
+                                                            },
+                                                            {
+                                                                "class": "b",
+                                                                "style<>": "o_image.o_image_pixel_hovered.n_b_normalized_o_style" ,
+                                                                "a_c" : [
+                                                                    {
+                                                                        "class": "text",
+                                                                        "a_c":[
+                                                                            {
+                                                                                "s_t": "span",
+                                                                                "s_inner_text": "b:"
+                                                                            }, 
+                                                                            {
+                                                                                "s_t": "sapn",
+                                                                                "innerHTML<>": "o_image.o_image_pixel_hovered.n_b_normalized_tofixed3"
+                                                                            },
+                                                                        ]
+                                                                    }
+                
+                                                                ]
+                                                            },
+                                                            {
+                                                                "class": "a",
+                                                                "style<>": "o_image.o_image_pixel_hovered.n_a_normalized_o_style" ,
+                                                                "a_c" : [
+                                                                    {
+                                                                        "class": "text",
+                                                                        "a_c":[
+                                                                            {
+                                                                                "s_t": "span",
+                                                                                "s_inner_text": "a:"
+                                                                            }, 
+                                                                            {
+                                                                                "s_t": "sapn",
+                                                                                "innerHTML<>": "o_image.o_image_pixel_hovered.n_a_normalized"
+                                                                            },
+                                                                        ]
+                                                                    }
+                
+                                                                ]
+                                                            },
+                                                            // {
+                                                            //     "class": "n_rgba_max", 
+                                                            //     "innerText<>": "o_image.o_image_pixel_hovered.n_n_rgba_max"
+                                                            // }
+                                         
+                                                        ]
+                                                    },
+                                                ]
+                                            },
+                                        ]
+                                    },
+                                    {
+                                        "class": "bottom bar",
+                                        "a_c": [
+                                            {
+                                                "class": "zoom factor",
+                                                "a_c": [
+                                                    {
+                                                        "s_inner_text": "mousewheel to change zoom factor: "
+                                                    },
+                                                    {
+                                                        "innerText<>": "o_img_zoomed.n_scale_factor"
+                                                    }
+                                                ]
                                             }
                                         ]
                                     }
                                 ]
-                            }
+                            },
+
                         ]
 
                     }, 
@@ -789,8 +822,6 @@ class O_overlay_imgzoombox{
                                 background:rgba(3,3,3,0.8);
                                 color:rgba(243, 243,243, 0.9);
                                 margin:${this.n_px_margin}px;
-                                padding: 0.9rem;
-                                max-width: ${this.n_px_max_width}px;
                                 font-family: arial;
                                 top:0; 
                                 left:0;
@@ -805,9 +836,10 @@ class O_overlay_imgzoombox{
                             .img_preview {
                                 overflow:hidden;
                                 width: 100%;
-                                padding-top: 100%;
                                 position:relative;
                                 border:1px solid red; 
+                                display: flex;
+                                flex-direction: column;
                             }
                             .img_preview .center{
                                 position:absolute; 
@@ -827,7 +859,7 @@ class O_overlay_imgzoombox{
                                 top:0; 
                                 left:0;
                                 background-size: contain;
-                        
+                                z-index:-1;
                                 image-rendering: pixelated;
                             }
                             .img_element {
@@ -861,6 +893,55 @@ class O_overlay_imgzoombox{
                                 display: flex;
                                 flex-direction: row;
                                 transform-origin: left top;
+                            }
+                            .o_overlay_imgzoombox {
+                                display: flex;
+                            }
+                            
+                            .o_overlay_imgzoombox {
+                            }
+                            
+                            .bar {
+                                width:100%
+                                z-index:1;
+                                background: rgba(0,0,0,0.8);
+                                display:flex;
+                            }
+                            
+
+                            
+                            .o_overlay_imgzoombox {
+                                width: 500px;
+                                height: 500px;
+                            }
+                            
+                            .img_preview {
+                                z-index: 0;
+                            }
+                            .o_overlay_imgzoombox {
+                                box-shadow: 0 2px 9px 4px rgb(0 0 0 / 38%);
+                            }
+                            .mouse.pixel {
+                                flex: 1 1 auto;
+                                display: flex;
+                                flex-direction: column;
+                            }
+                            
+                            .mouse.pixel .r,
+                            .mouse.pixel .g,
+                            .mouse.pixel .b,
+                            .mouse.pixel .a
+                            {
+                                flex: 1 1 auto;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                            }
+                            .mouse.pixel .text{
+                                background:rgba(0,0,0,0.85); 
+                                color: white;
+                                padding:3px;
+                                border-radius:3px;
                             }
                         `
                     }
