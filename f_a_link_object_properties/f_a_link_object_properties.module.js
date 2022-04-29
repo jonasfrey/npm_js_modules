@@ -101,23 +101,31 @@ var f_recursive_update_new_set_proxy_object = function(value_old, value_new, o_p
             // console.log(value)
         
             // also exchange the object reference on the other object 
-            for(var n_index in value_old.a_o_other){
-                var o_other = value_old.a_o_other[n_index]
-                for(var n_index in o_other.object.a_o_other){
-                    var o_other = o_other.object.a_o_other[n_index]
+            let n_index1 = 0; 
+            while(n_index1 < value_old.a_o_other.length){
+                var o_other1 = value_old.a_o_other[n_index1]
+
+                let n_index2 = 0; 
+                while(n_index2 < o_other1.object.a_o_other.length){
+                    var o_other2 = o_other1.object.a_o_other[n_index2]
                     // debugger
-                    var bool = o_other.object.o_proxy == value_old.o_proxy
+                    var bool = o_other2.object.o_proxy == value_old.o_proxy
                     // console.log("now")
                     // console.log(o_other.object.o_proxy)
                     // console.log(value_old)
-                    if(o_other.object.o_proxy == value_old.o_proxy){
+                    if(o_other2.object.o_proxy == value_old.o_proxy){
                         // debugger
                         // change the reference 
-                        o_other.object = value_new
+                        o_other2.object = value_new
                     }
-                }    
-                // console.log(value_old.a_o_other[n_index])
+                    
+                    n_index2++;
+                }
+
+                n_index1++; 
             }
+
+
     
             //now we have to trigger the setter on all linked properties, 
             for(var n_index in value_old.a_o_other){

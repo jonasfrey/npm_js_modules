@@ -293,6 +293,12 @@ class O_json_to_html {
 
     f_o_json_or_jsobject_to_html(value, o_data_parent = null, s_prop_name_on_o_data_parent = null){
 
+        // allows usage of o_json_to_html without using synchronized o_data 
+        if(!o_data_parent){
+            o_data_parent =  {o_data:{}}
+            s_prop_name_on_o_data_parent = "o_data"
+        }
+
         this.o_data = o_data_parent[s_prop_name_on_o_data_parent];
         
         var obj = this.f_o_recursive_convert_object_to_html_element(
