@@ -852,10 +852,121 @@ var f_simple_json_to_html_demo_with_data_and_changing_objects_with_nested_object
 
 }
 
+var f_simple_html_to_json_demo_arrays = function(){
+
+    window.o_data = {
+        a_nums: [
+            {
+                val: 1, 
+            },
+            {
+                val: 3, 
+            }, 
+            {
+                val: 18, 
+            }
+        ]
+    }
+    window.o_layout = {
+        
+        s_t: "div",
+        // a_c:  [{
+        //     "s_inner_text": 'asdf'
+        // }],
+        // a_c: function(){ // static example 
+        //     return function(){
+
+        //         return [
+        //             {
+        //                 "innerText<>": "a_nums.0.val"
+        //             }
+        //         ]
+        //     }
+        // } 
+        a_c: function(){ // dynamic example
+            return function(){
+                console.log(this)
+                var a = []
+                for(var n_index in this.a_nums){
+                    var o_num = this.a_nums[n_index]; 
+                    a.push(
+                        {
+                            "innerText<>": "a_nums."+n_index+".val"
+                        }
+                    )
+                }
+                return a
+            }
+        } 
+        // a_c(){
+        //     console.log(this); 
+
+        //         return [{
+        //             "s_inner_text": 'asdf'
+        //         }]
+        // }
+        // a_c: [
+        //     {
+        //         s_for: "n_index, o_value in a_nums", 
+        //         "innerHTML<>": "o_value.val"
+        //     },
+
+        // ]
+
+    }
+
+    document.documentElement.appendChild(
+        o_json_to_html.f_o_json_to_html(
+            o_layout,
+            // o_json_to_html_demo.s_json_example_with_data2,
+            window, // data parent object, 
+            "o_data", // data parent object property name
+        )
+    )
+    o_data.a_nums.push({
+        val : 22
+    })
+
+    o_data.a_nums.pop();
+
+    o_data.a_nums = [
+        {val:1234}
+    ]; 
+
+}
+
+var f_simple_f_o_data_layout = function(){
+    // if we pass a funciton to the f_o_json_to_html library, it can use it to 
+    // re-render the layout object 
+    var f_o_o_data_and_o_layout = function(){
+        return {
+            o_data: {
+                n_test: 1234, 
+            }, 
+            o_layout: {
+                "a_c":[
+
+                    {
+                        "s_t": "h1", 
+                        "innerHTML<>": "n_test"
+                    }
+                ]
+            }, 
+        }
+    }
+    window.o_json_to_html = o_json_to_html
+    o_json_to_html.f_o_json_to_html_with_function(
+        f_o_o_data_and_o_layout, 
+        document.documentElement
+    )
+}
+
 // f_simple_html_to_json_demo()
 // f_simple_json_to_html_demo()
 // f_simple_json_to_html_demo_with_data()
 // f_simple_json_to_html_demo_with_data_and_changing_objects()
-f_simple_json_to_html_demo_with_data_and_changing_objects_with_nested_object()
+// f_simple_json_to_html_demo_with_data_and_changing_objects_with_nested_object()
+// f_simple_html_to_json_demo_arrays()
+f_simple_f_o_data_layout();
 
 })

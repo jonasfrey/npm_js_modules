@@ -13,6 +13,8 @@ class O_json_to_html {
         this.s_default_tag_name = "div"
         this.s_default_o_data_first_property = "o_data"
         this.o_data = null
+        this.o_data_and_o_layout = null;
+        this.o_html_object_to_append_child_on = null; 
     }
 
     f_o_get_object_and_property_by_dot_notation(o_object, s_dotnotation){
@@ -79,26 +81,32 @@ class O_json_to_html {
             ){ 
                 var s_prop_name_o_html_element = s_prop_name.substring(0, (s_prop_name.length - o_string_ending.s_ending.length))
                 var s_prop_name_o_data_for_linking = value
+                if(typeof value != 'object'){
 
-                // s_prop_name_o_data_for_linking could be a property in dotnotation 
-                // which points to a nested object, for example 'color.rgba.r'
-                // so we have to get the parent object 'color.rgba' and the propname 'r'
-                // foreach nested object we have to add a proxy, because 
-                // if a nested object changes, the proxy would be lost!!!
-                var o_resolved_dotnotation = this.f_o_get_object_and_property_by_dot_notation(
-                    o_data_parent, 
-                    s_prop_name_on_o_data_parent + "." + s_prop_name_o_data_for_linking
-                );
-                
-                if(!o_resolved_dotnotation.o_object.o_object || !o_resolved_dotnotation.o_object_parent.o_object){
-                    console.error(`property ${s_prop_name_o_data_for_linking} does not exist in object ${o_data}`)
+                    // s_prop_name_o_data_for_linking could be a property in dotnotation 
+                    // which points to a nested object, for example 'color.rgba.r'
+                    // so we have to get the parent object 'color.rgba' and the propname 'r'
+                    // foreach nested object we have to add a proxy, because 
+                    // if a nested object changes, the proxy would be lost!!!
+                    var o_resolved_dotnotation = this.f_o_get_object_and_property_by_dot_notation(
+                        o_data_parent, 
+                        s_prop_name_on_o_data_parent + "." + s_prop_name_o_data_for_linking
+                    );
+                    
+                    if(!o_resolved_dotnotation.o_object.o_object || !o_resolved_dotnotation.o_object_parent.o_object){
+                        console.error(`property ${s_prop_name_o_data_for_linking} does not exist in object ${o_data}`)
+                    }
+
+                    var o_data_resolved = o_resolved_dotnotation.o_object.o_object
+                    var o_data_resolved_parent = o_resolved_dotnotation.o_object_parent.o_object
+                    var s_prop_o_data_resolved = o_resolved_dotnotation.o_object.s_prop
+                    var s_prop_o_data_resolved_parent = o_resolved_dotnotation.o_object_parent.s_prop
+                }
+                if(typeof value == 'object'){
+                    var o_data_resolved = value.o_data_parent; 
+                    var s_prop_o_data_resolved = value.s_prop_o_data_resolved; 
                 }
 
-                var o_data_resolved = o_resolved_dotnotation.o_object.o_object
-                var o_data_resolved_parent = o_resolved_dotnotation.o_object_parent.o_object
-                var s_prop_o_data_resolved = o_resolved_dotnotation.o_object.s_prop
-                var s_prop_o_data_resolved_parent = o_resolved_dotnotation.o_object_parent.s_prop
-                
                 if(
                     !Array.isArray(o_data_resolved[s_prop_o_data_resolved]) && typeof o_data_resolved[s_prop_o_data_resolved] == "object"
                     ){
@@ -217,7 +225,13 @@ class O_json_to_html {
         }
 
         // handle childre
-        var a_o_child_object = object[this.s_prop_name_children_elements]
+        // console.log(typeof object[this.s_prop_name_children_elements]);
+        // console.log(object)
+        if(typeof object[this.s_prop_name_children_elements] == 'function'){
+            var a_o_child_object = object[this.s_prop_name_children_elements].call(this.o_data)
+        }else{
+            var a_o_child_object = object[this.s_prop_name_children_elements]
+        }
         if(a_o_child_object){
             for(var n_index_a_o_child_object in a_o_child_object){
                 var o_child = a_o_child_object[n_index_a_o_child_object]    
@@ -279,7 +293,8 @@ class O_json_to_html {
 
     f_o_json_or_jsobject_to_html(value, o_data_parent = null, s_prop_name_on_o_data_parent = null){
 
-
+        this.o_data = o_data_parent[s_prop_name_on_o_data_parent];
+        
         var obj = this.f_o_recursive_convert_object_to_html_element(
             this.f_o_convert_string_to_javascript_object(value),
             o_data_parent, 
@@ -289,7 +304,23 @@ class O_json_to_html {
         return obj
         
     }
-
+    // this will receive a function which returns an object, 
+    // this way the layout can be rendered again
+    f_o_json_to_html_with_function(
+        f_o_o_data_and_o_layout, 
+        o_html_object_to_append_child_on
+    ){
+        this.o_data_and_o_layout = f_o_o_data_and_o_layout();
+        
+        this.o_html_object_to_append_child_on = o_html_object_to_append_child_on; 
+        var o_layout_rendered = this.f_o_json_or_jsobject_to_html(
+            this.o_data_and_o_layout["o_layout"],
+            this.o_data_and_o_layout,
+            "o_data"
+        )
+        this.o_html_object_to_append_child_on.appendChild(o_layout_rendered)
+        return o_layout_rendered
+    }
     f_o_json_to_html(value,  o_data_parent = null, s_prop_name_on_o_data_parent = null){
         return this.f_o_json_or_jsobject_to_html(value, o_data_parent,s_prop_name_on_o_data_parent)
     }

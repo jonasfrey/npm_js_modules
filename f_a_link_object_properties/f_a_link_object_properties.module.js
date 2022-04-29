@@ -148,7 +148,7 @@ var f_recursive_update_new_set_proxy_object = function(value_old, value_new, o_p
                 // otherwise throw warning
                 if(!value_new.hasOwnProperty(s_prop)){
                     console.warn("data(types) should not change")
-                    console.warn("property: "+s_prop+ " does not exists on " + value_+ " but it did exist on "+value_old)
+                    // console.warn("property: "+s_prop+ " does not exists on " + value_+ " but it did exist on "+value_old)
                 }
                 if(value_new[s_prop]){
                     f_recursive_update_new_set_proxy_object(o_value_old_child, value_new[s_prop], value_new, s_prop)
