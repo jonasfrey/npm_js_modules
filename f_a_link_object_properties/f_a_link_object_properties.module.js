@@ -125,7 +125,6 @@ var f_recursive_update_new_set_proxy_object = function(value_old, value_new, o_p
                 n_index1++; 
             }
 
-
     
             //now we have to trigger the setter on all linked properties, 
             for(var n_index in value_old.a_o_other){

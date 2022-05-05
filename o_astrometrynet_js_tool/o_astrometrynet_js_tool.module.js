@@ -24,25 +24,39 @@ window.O_overlay_textbox = O_overlay_textbox
 class O_api_endpoint{
     constructor(
         s_name = "annotations", 
-        s_url_template_literal = "http://nova.astrometry.net/api/jobs/${data.n_job_id}/annotations/",
+        s_url_template_literal = "https://nova.astrometry.net/api/jobs/${this.o_data.n_job_id}/annotations/",
         _o_data = {}
     ){
         this.s_url_template_literal = s_url_template_literal
         this.s_url = s_url_template_literal 
         this.s_name = s_name
-        this.o_data = _o_data
+        var self = this
+        this.o_data = new Proxy(_o_data, {
+            set: function(obj, s_prop, val){
+                var f_s_string = new Function(`
+                    return \``+self.s_url_template_literal+`\`
+                `)
+                console.log(f_s_string)
+                var s_string = f_s_string.apply(self);
+                console.log(s_string)
+                self.s_url = s_string
+                return Reflect.set(obj, s_prop, val)
+            }
+        })
     }
 
-    get o_data(){
-        return this._o_data
-    }
-    set o_data(value){
-        this._o_data = value; 
-        var s_string = new Function(`
-            return '`+this.s_url+`'
-        `).apply(this);
-        this.s_url = s_string
-    }
+    // get o_data(){
+    //     return this._o_data
+    // }
+    // set o_data(value){
+    //     this._o_data = value; 
+    //     var s_string = new Function(`
+    //         return '`+this.s_url_template_literal+`'
+    //     `).apply(this);
+    //     console.log(s_string)
+    //     debugger
+    //     this.s_url = s_string
+    // }
 }
 class O_astrometrynet_js_tool{
     constructor(){
@@ -51,7 +65,7 @@ class O_astrometrynet_js_tool{
         this.a_o_api_endpoint = [
             new O_api_endpoint(
                 "annotations", 
-                "http://nova.astrometry.net/api/jobs/${data.n_job_id}/annotations/", 
+                "https://nova.astrometry.net/api/jobs/${this.o_data.n_job_id}/annotations/", 
                 {
                     n_job_id: 5853832
                 }
@@ -65,16 +79,26 @@ class O_astrometrynet_js_tool{
         this.o_data = {
             s_input_url : "url: example : https://nova.astrometry.net/user_images/6423213", 
             "o_getter_setter": {
-                "f_setter_s_input_url": function(val){
+                "f_setter_n_job_id": function(value_old, object, s_prop, o_value){
                     // val //  for example https://nova.astrometry.net/user_images/5854211#original
-                    var s_job_id = val.toString().split("#").shift().split("/").pop()
-                    var n_job_id = parseInt(s_job_id); 
-                    console.log(n_job_id);
+                    // var s_job_id = val.toString().split("#").shift().split("/").pop()
+                    // var n_job_id = parseInt(s_job_id);
+                    var n_job_id = parseInt(o_value.value);
                     self.n_job_id = n_job_id
                 }
             },
             n_job_id: 6423213,
             s_image_url: "https://nova.astrometry.net/grid_display/6423213", 
+            o_overlay: {
+                s_inner_html: "hello", 
+                o_style: {
+                    display:"block", 
+                    position:"fixed", 
+                    top: "0px", 
+                    left:"0px"
+                }
+            },
+            a_annotations: []
             
             
         }
@@ -104,6 +128,14 @@ class O_astrometrynet_js_tool{
     }
     set n_job_id(value){
         this.o_data.s_image_url = this.s_image_url_template_literal.replace('${jobid}', value)
+        
+        var o_api_endpoint = this.a_o_api_endpoint.filter(o=>o.s_name == "annotations")[0];
+        if(o_api_endpoint){
+            o_api_endpoint.o_data.n_job_id = value;
+        }
+        fetch(o_api_endpoint.s_url,  {mode: 'no-cors'})
+        .then(response => {console.log(response); response.text()})
+        .then(data => console.log(data));
         this._n_job_id = value
     }
 
@@ -120,7 +152,15 @@ class O_astrometrynet_js_tool{
         return this.o_json_to_html.f_o_javascript_object_to_html(
             {
                 s_t: "div", 
+                // onmousemove: function(){
+                //     this.o_overlay.o_style.display = "none"
+                // },
                 a_c: [
+                    {
+                        "class": "o_html_element_overlay", 
+                        "innerHTML<>": "o_overlay.s_inner_html",
+                        "style<>": "o_overlay.o_style"
+                    },
                     {
                         "s_t": "label", 
                         "innerHTML<>": "n_job_id", 
@@ -129,7 +169,33 @@ class O_astrometrynet_js_tool{
                     {
                         "class": this.s_class_name,
                         "s_t": "input", 
-                        "s_o_overlay_textbox": "asdf",
+                        onmousemove: function(){
+                            console.log("mousemove called")
+
+                            if(this.o_overlay?.o_style?.display){
+                                this.o_overlay.o_style.left = window.event.clientX+"px"
+                                this.o_overlay.o_style.top = window.event.clientY+"px"
+                                this.o_overlay.s_inner_html = "<img src='o_astrometrynet_js_tool/astronometrynet_jobid.png'>"
+                            }
+                        },
+                        onmouseenter: function(){
+                            console.log("mouseenter called")
+                            // this.o_overlay.o_style.display = "block"
+                            if(this.o_overlay?.o_style?.display){
+                                this.o_overlay.o_style.display = "block"
+                                // console.log(this.o_overlay.o_style.display)
+                            }
+                        }, 
+                        onmouseleave: function(){
+                            console.log("mouseleave called")
+                            if(this.o_overlay?.o_style?.display){
+                                this.o_overlay.o_style.display = "none"
+                                // console.log(this.o_overlay.o_style.display)
+                            }
+                        },
+                        // somehow the implementation of o_overlay_textbox is pretty laggy it seems like it has interferences with f_a_link_object_properties from this o_astrometry_js_tool library... thats why i use custom overlay here
+
+                        //"s_o_overlay_textbox": "![/o_astrometrynet_js_tool/astronometrynet_jobid.png](/o_astrometrynet_js_tool/astronometrynet_jobid.png)",
                         "value<>": "n_job_id", 
 
                     },

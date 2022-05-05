@@ -189,13 +189,24 @@ class O_json_to_html {
                     var self = this
                     //onclick , onmousemove, onwheel, etc functions
                     // console.log(value)
-                    var f_value = value 
-                    o_html_element.addEventListener(s_prop_name.substring(2), function(event){
+                    // debugger
+                    let f_value = value 
+                    // o_html_element.addEventListener(
+                    //     s_prop_name,//.substring(2), // .onmousemove is also a valid property and allows directer control 
+                    //     function(event){
+                    //         f_value.apply(
+                    //             o_data_parent[s_prop_name_on_o_data_parent],
+                    //             [event]
+                    //         )
+                    //     }
+                    // )
+                    o_html_element[s_prop_name] = function(event){
                         f_value.apply(
                             o_data_parent[s_prop_name_on_o_data_parent],
                             [event]
                         )
-                    })
+                    }
+
                     // o_html_element[s_prop_name] = value
                 }else{
                     // if(

@@ -134,3 +134,14 @@ adding `package.json` keywords
 - documentation updates
 - added the possibility to convert with a function 
 - added the possibility to add a custom function name pattern for converting numbers via funciton call
+## 1.0.5
+vuejs was not working because somehow the getter was called with s_prop as type symbol, added this to the getter
+```javascript
+                
+if(typeof s_prop === 'symbol'){
+    return Reflect.get(object, s_prop)
+}
+```
+
+## 1.0.6 
+more changes to make it working with vuejs, but proxies as data objects are not really working in vuejs
